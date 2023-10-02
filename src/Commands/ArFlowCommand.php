@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace AuroraWebSoftware\ArFlow\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class ArFlowCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'arflow';
 
     public $description = 'My command';
 
