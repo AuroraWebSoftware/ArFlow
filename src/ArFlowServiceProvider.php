@@ -2,9 +2,9 @@
 
 namespace AuroraWebSoftware\ArFlow;
 
+use AuroraWebSoftware\ArFlow\Commands\ArFlowCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use AuroraWebSoftware\ArFlow\Commands\ArFlowCommand;
 
 class ArFlowServiceProvider extends PackageServiceProvider
 {

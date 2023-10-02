@@ -2,9 +2,9 @@
 
 namespace AuroraWebSoftware\ArFlow\Tests;
 
+use AuroraWebSoftware\ArFlow\ArFlowServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use AuroraWebSoftware\ArFlow\ArFlowServiceProvider;
 
 class TestCase extends Orchestra
 {
