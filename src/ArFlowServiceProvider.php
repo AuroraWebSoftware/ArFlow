@@ -3,9 +3,9 @@
 namespace AuroraWebSoftware\ArFlow;
 
 use Illuminate\Database\Schema\Blueprint;
+use AuroraWebSoftware\ArFlow\Commands\ArFlowCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use AuroraWebSoftware\ArFlow\Commands\ArFlowCommand;
 
 class ArFlowServiceProvider extends PackageServiceProvider
 {
