@@ -8,8 +8,11 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('arflow_table', function (Blueprint $table) {
+        Schema::create('payment_plan', function (Blueprint $table) {
             $table->id();
+            $table->string('asd');
+            $table->int('aasd');
+            $table->arflow();
 
             // add fields
 

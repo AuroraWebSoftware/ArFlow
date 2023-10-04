@@ -2,12 +2,27 @@
 
 namespace AuroraWebSoftware\ArFlow;
 
+use Illuminate\Database\Schema\Blueprint;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use AuroraWebSoftware\ArFlow\Commands\ArFlowCommand;
 
 class ArFlowServiceProvider extends PackageServiceProvider
 {
+    public function boot(): ArFlowServiceProvider
+    {
+        Blueprint::macro('arflow', function (string $workflow = 'workflow', string $state='state', string $stateMetadata='state_metadata') {
+            /**
+             * @var Blueprint $this
+             */
+            $this->string($workflow)->nullable(false)->index();
+            $this->string($state)->nullable(false)->index();
+            $this->json($stateMetadata)->nullable(false);
+        });
+
+        return parent::boot();
+    }
+
     public function configurePackage(Package $package): void
     {
         /*
