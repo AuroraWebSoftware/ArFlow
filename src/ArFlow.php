@@ -4,7 +4,6 @@ namespace AuroraWebSoftware\ArFlow;
 
 use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use Illuminate\Database\Eloquent\Model;
-use function Symfony\Component\Translation\t;
 
 class ArFlow
 {
@@ -14,9 +13,8 @@ class ArFlow
         $this->modelInstance->currentState();
     }
 
-    public function canTransitionTo() {
+    public function canTransitionTo()
+    {
 
     }
-
-
 }
