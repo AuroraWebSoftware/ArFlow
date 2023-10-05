@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class TestDisallowedTransitionGuard implements TransitionGuardContract
 {
-
     public function boot(StateableModelContract&Model $model, $from, $to, ...$parameters)
     {
         // TODO: Implement boot() method.

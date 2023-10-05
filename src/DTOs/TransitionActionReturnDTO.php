@@ -7,39 +7,30 @@ use Illuminate\Support\Collection;
 class TransitionActionReturnDTO
 {
     const SUCCESS = 1;
+
     const FAIL = 2;
 
-    public static function build(int $status) : self {
+    public static function build(int $status): self
+    {
         return new self($status);
     }
 
-    /**
-     * @param int $status
-     * @param Collection|null $messages
-     */
     public function __construct(
-        public int         $status,
+        public int $status,
         public ?Collection $messages = null,
-    )
-    {
+    ) {
     }
 
-    /**
-     * @param string $message
-     * @return TransitionActionReturnDTO
-     */
-    public function addMessage(string $message) : TransitionActionReturnDTO
+    public function addMessage(string $message): TransitionActionReturnDTO
     {
         $this->messages->push($message);
+
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function executed(): bool
     {
-        return ($this->status) == self::SUCCESS;
+        return $this->status == self::SUCCESS;
     }
 
     /**
@@ -49,5 +40,4 @@ class TransitionActionReturnDTO
     {
         return $this->messages;
     }
-
 }

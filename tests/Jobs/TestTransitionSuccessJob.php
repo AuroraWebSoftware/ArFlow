@@ -2,7 +2,6 @@
 
 namespace AuroraWebSoftware\ArFlow\Tests\Jobs;
 
-
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -16,7 +15,9 @@ class TestTransitionSuccessJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     /**
      * Execute the job.
@@ -25,5 +26,4 @@ class TestTransitionSuccessJob implements ShouldQueue
     {
         // Process uploaded podcast...
     }
-
 }

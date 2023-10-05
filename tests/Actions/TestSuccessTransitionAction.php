@@ -9,14 +9,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class TestSuccessTransitionAction implements TransitionActionContract
 {
-
     public function boot(StateableModelContract&Model $model, $from, $to, ...$parameters)
     {
         // TODO: Implement boot() method.
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function handle(): TransitionActionReturnDTO
     {

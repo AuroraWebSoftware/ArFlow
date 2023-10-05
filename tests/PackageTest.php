@@ -1,6 +1,5 @@
 <?php
 
-
 use AuroraWebSoftware\ArFlow\Tests\Models\Stateable;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Artisan;
@@ -33,12 +32,12 @@ beforeEach(function () {
                                 'successJob' => [],
                                 'failMetadata' => [],
                                 'failJob' => [],
-                            ]
-                        ]
+                            ],
+                        ],
 
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ]
     );
 
@@ -49,7 +48,6 @@ beforeEach(function () {
         $table->timestamps();
     });
 
-
     /*
     $this->app->singleton('aauth', function ($app) {
         return new \AuroraWebSoftware\AAuth\AAuth(
@@ -59,7 +57,6 @@ beforeEach(function () {
     });
     */
 });
-
 
 it('can create a stateable model instance', function () {
 
@@ -88,7 +85,6 @@ it('a', function () {
     $modelInstance->canTransitionTo('a');
 
 });
-
 
 it('can create a stateable model instances', function () {
 

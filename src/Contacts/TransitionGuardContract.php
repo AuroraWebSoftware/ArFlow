@@ -9,13 +9,11 @@ use Illuminate\Database\Eloquent\Model;
 
 interface TransitionGuardContract
 {
-    public function boot(StateableModelContract & Model $model, $from, $to, ...$parameters);
+    public function boot(StateableModelContract&Model $model, $from, $to, ...$parameters);
 
     /**
      * @throws WorkflowNotFoundException
      * @throws WorkflowNotSupportedException
-     * @return TransitionGuardReturnDTO
      */
     public function handle(): TransitionGuardReturnDTO;
-
 }

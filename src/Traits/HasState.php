@@ -9,10 +9,10 @@ use Illuminate\Support\Facades\Config;
 
 trait HasState
 {
-
     public function getGuarded(): array
     {
         $self = self::class;
+
         return [$self::workflowAttribute(), $self::stateAttribute(), $self::stateMetadataAttribute()];
     }
 
@@ -96,11 +96,10 @@ trait HasState
     public function transitionTo(
         string $state, string $comment = null,
         string $byModelType = null, int $byModelId = null,
-        array  $metadata = null,
-        array  $withoutGuards = null,
-        bool   $transitionHistoryAction = true
-    ): bool
-    {
+        array $metadata = null,
+        array $withoutGuards = null,
+        bool $transitionHistoryAction = true
+    ): bool {
 
         //throw new WorkflowNotSupportedException();
         //throw new WorkflowNotFoundException();
