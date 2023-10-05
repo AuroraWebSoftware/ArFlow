@@ -13,9 +13,8 @@ class ArFlow
         $this->modelInstance->currentState();
     }
 
-    public function canTransitionTo() {
+    public function canTransitionTo()
+    {
 
     }
-
-
 }

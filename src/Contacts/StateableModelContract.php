@@ -2,7 +2,6 @@
 
 namespace AuroraWebSoftware\ArFlow\Contacts;
 
-
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotSupportedException;
 
@@ -37,8 +36,7 @@ interface StateableModelContract
 
     /**
      * applies the workflow to the instance
-     * @param string $workflow
-     * @return bool
+     *
      * @throws WorkflowNotFoundException
      * @throws WorkflowNotSupportedException
      */
@@ -69,7 +67,6 @@ interface StateableModelContract
      * @return bool
      */
     public function canTransitionTo(string $state, array $withoutGuards = null): bool;
-
 
     /**
      * @param array<class-string>|null $withoutGuards

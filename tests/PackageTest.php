@@ -1,6 +1,5 @@
 <?php
 
-
 it('can create a stateable model instance', function () {
 
     $modelInstance = \AuroraWebSoftware\ArFlow\Tests\Models\StateableModel::create(
@@ -10,7 +9,6 @@ it('can create a stateable model instance', function () {
     /**
      * @var \Illuminate\Database\Eloquent\Model&\AuroraWebSoftware\ArFlow\Contacts\StateableModelContract $modelInstance
      */
-
     $modelInstance->applyWorkflow('a');
 
     $modelInstance->canTransitionTo('b');
