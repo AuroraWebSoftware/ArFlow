@@ -14,9 +14,18 @@ return new class extends Migration
             $table->int('aasd');
             $table->arflow();
 
+            $table->string($workflow)->nullable(false)->index();
+            $table->string($state)->nullable(false)->index();
+            $table->json($stateMetadata)->nullable(false);
+
             // add fields
 
             $table->timestamps();
         });
+    }
+
+    public function down()
+    {
+        Schema::drop('payment_plan');
     }
 };

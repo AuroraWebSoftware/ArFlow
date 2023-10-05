@@ -3,7 +3,9 @@
 namespace AuroraWebSoftware\ArFlow;
 
 use AuroraWebSoftware\ArFlow\Commands\ArFlowCommand;
+use AuroraWebSoftware\ArFlow\Traits\HasState;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Traits\Macroable;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
