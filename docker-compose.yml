@@ -1,0 +1,20 @@
+version: '3.7'
+
+services:
+  mariadb:
+    image: mariadb:10.8
+    ports:
+      - "33062:3306"
+    volumes:
+      - ~/apps/arflow/mariadb:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=arflow
+      - MYSQL_PASSWORD=arflow
+      - MYSQL_USER=arflow
+      - MYSQL_DATABASE=arflow
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.51.0/24

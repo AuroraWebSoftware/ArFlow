@@ -7,7 +7,7 @@ use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotSupportedException;
 
 /**
- *
+ * Stateable Model
  */
 interface StateableModelContract
 {
