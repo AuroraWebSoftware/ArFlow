@@ -17,9 +17,9 @@ class ArFlowServiceProvider extends PackageServiceProvider
             /**
              * @var Blueprint $this
              */
-            $this->string($workflow)->nullable(false)->index();
-            $this->string($state)->nullable(false)->index();
-            $this->json($stateMetadata)->nullable(false);
+            $this->string($workflow)->nullable()->index();
+            $this->string($state)->nullable()->index();
+            $this->json($stateMetadata)->nullable();
         });
 
         return parent::boot();
@@ -34,7 +34,7 @@ class ArFlowServiceProvider extends PackageServiceProvider
          */
         $package
             ->name('arflow')
-            ->hasConfigFile()
+            ->hasConfigFile('arflow')
             ->hasViews()
             ->hasMigration('create_arflow_table')
             ->hasCommand(ArFlowCommand::class);

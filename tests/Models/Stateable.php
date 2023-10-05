@@ -6,7 +6,7 @@ use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\Traits\HasState;
 use Illuminate\Database\Eloquent\Model;
 
-class StateableModel extends Model implements StateableModelContract
+class Stateable extends Model implements StateableModelContract
 {
     use HasState;
 

@@ -5,13 +5,23 @@ namespace AuroraWebSoftware\ArFlow\Traits;
 use AuroraWebSoftware\ArFlow\ArFlow;
 use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Config;
 
 trait HasState
 {
-    public function bootArflow()
+
+    public function getGuarded(): array
+    {
+        $self = self::class;
+        return [$self::workflowAttribute(), $self::stateAttribute(), $self::stateMetadataAttribute()];
+    }
+
+    /*
+    public function bootArflow(): void
     {
         $this->service = new ArFlow($this);
     }
+    */
 
     public static function workflowAttribute(): string
     {
@@ -73,9 +83,9 @@ trait HasState
 
     public function canTransitionTo(string $state, array $withoutGuards = null): bool
     {
-        $this->service->canTransitionTo();
+        $workflows = Config::get('arflow.workflows');
+        dd($workflows);
 
-        return false;
     }
 
     public function possibleTransitions(array $withoutGuards = null): ?array
@@ -86,10 +96,11 @@ trait HasState
     public function transitionTo(
         string $state, string $comment = null,
         string $byModelType = null, int $byModelId = null,
-        array $metadata = null,
-        array $withoutGuards = null,
-        bool $transitionHistoryAction = true
-    ): bool {
+        array  $metadata = null,
+        array  $withoutGuards = null,
+        bool   $transitionHistoryAction = true
+    ): bool
+    {
 
         //throw new WorkflowNotSupportedException();
         //throw new WorkflowNotFoundException();
