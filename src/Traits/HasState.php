@@ -2,12 +2,14 @@
 
 namespace AuroraWebSoftware\ArFlow\Traits;
 
+use AuroraWebSoftware\ArFlow\Collections\TransitionGuardResultCollection;
 use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\Exceptions\InitialStateNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\TransitionNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotSupportedException;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Throwable;
 
@@ -132,8 +134,11 @@ trait HasState
     /**
      * @throws WorkflowNotFoundException|Throwable
      */
-    public function canTransitionTo(string $state, array $withoutGuards = null): bool
+    public function canTransitionTo(string $state, array $withoutGuards = null): TransitionGuardResultCollection
     {
+
+        //$collection = TransitionGuardResultCollection::make();
+        $collection = collect();
 
         $appliedWorkflowValue = Config::get('arflow.workflows')[$this->appliedWorkflow()];
         throw_unless($appliedWorkflowValue, WorkflowNotFoundException::class, $this->appliedWorkflow() . ' Not Found');
@@ -146,6 +151,10 @@ trait HasState
 
             if ($this->currentState() == $from || in_array($this->currentState(), $from)) {
 
+                foreach () {
+                    $collection->push()
+                }
+
             }
 
         }
@@ -154,6 +163,7 @@ trait HasState
 
         dd($appliedWorkflow);
 
+        return $collection->allMessages();
 
         // dd($workflows);
 
