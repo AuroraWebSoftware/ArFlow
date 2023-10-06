@@ -184,7 +184,7 @@ it('a', function () {
     );
 
     $modelInstance->applyWorkflow($workflow);
-    dd($modelInstance->canTransitionTo('in_progress')->messages());
+    dd($modelInstance->canTransitionTo('in_progress')->allowed());
 
 });
 

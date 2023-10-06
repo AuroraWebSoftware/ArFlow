@@ -60,16 +60,25 @@ interface StateableModelContract
      */
     public function currentStateMetadata(): array;
 
+
     /**
-     * @return TransitionGuardResultCollection<string, Collection<TransitionGuardResultDTO>>
-     * @throws WorkflowNotFoundException|Throwable
+     * @return TransitionGuardResultCollection<string, Collection<int, TransitionGuardResultDTO>>
+     * @throws WorkflowNotFoundException
      */
-    public function canTransitionTo(string $toState, array $withoutGuards = null): TransitionGuardResultCollection;
+    public function transitionGuardResults(string $toState, array $withoutGuards = null): TransitionGuardResultCollection;
+
+
+    /**
+     * @param string $toState
+     * @param array|null $withoutGuards
+     * @return bool
+     */
+    public function canTransitionTo(string $toState, array $withoutGuards = null): bool;
 
     /**
      * @param array<class-string>|null $withoutGuards
      */
-    public function possibleTransitions(array $withoutGuards = null): ?array;
+    public function allowedTransitions(array $withoutGuards = null): ?array;
 
     /**
      * @param  ?class-string $byModelType

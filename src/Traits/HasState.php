@@ -138,7 +138,7 @@ trait HasState
      * @return TransitionGuardResultCollection<string, Collection<TransitionGuardResultDTO>>
      * @throws WorkflowNotFoundException|Throwable
      */
-    public function canTransitionTo(string $toState, array $withoutGuards = null): TransitionGuardResultCollection
+    public function transitionGuardResults(string $toState, array $withoutGuards = null): TransitionGuardResultCollection
     {
         $collection = TransitionGuardResultCollection::make();
 
@@ -173,7 +173,16 @@ trait HasState
         return $collection;
     }
 
-    public function possibleTransitions(array $withoutGuards = null): ?array
+    /**
+     * @throws Throwable
+     * @throws WorkflowNotFoundException
+     */
+    public function canTransitionTo(string $toState, array $withoutGuards = null): bool
+    {
+        return $this->transitionGuardResults($toState, $withoutGuards)->allowed();
+    }
+
+    public function allowedTransitions(array $withoutGuards = null): ?array
     {
         return null;
     }

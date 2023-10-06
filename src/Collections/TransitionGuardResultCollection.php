@@ -15,8 +15,21 @@ class TransitionGuardResultCollection extends Collection
 
     public function allowed(): bool
     {
+        $allowed = false;
 
+        $this->each(
+            function (Collection $collection) use (&$allowed) {
+                $collection->each(
+                    function (TransitionGuardResultDTO $transitionGuardResultDTO) use (&$allowed) {
+                        if ($transitionGuardResultDTO->status == TransitionGuardResultDTO::ALLOWED) {
+                            $allowed = true;
+                        }
+                    }
+                );
+            }
+        );
 
+        return $allowed;
     }
 
     /**
