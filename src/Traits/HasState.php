@@ -166,7 +166,6 @@ trait HasState
                 }
 
                 $collection->put($transitionKey, $c);
-
             }
         }
 
@@ -182,9 +181,44 @@ trait HasState
         return $this->transitionGuardResults($toState, $withoutGuards)->allowed();
     }
 
-    public function allowedTransitions(array $withoutGuards = null): ?array
+    public function definedTransitionStates(array $withoutGuards = null): ?array
     {
-        return null;
+        $definedTransitions = [];
+
+        $appliedWorkflowValue = Config::get('arflow.workflows')[$this->appliedWorkflow()];
+        throw_unless($appliedWorkflowValue, WorkflowNotFoundException::class, $this->appliedWorkflow() . ' Not Found');
+
+        $transitions = $appliedWorkflowValue['transitions'] ?? null;
+        throw_unless($transitions, TransitionNotFoundException::class);
+
+        foreach ($transitions as $transitionKey => $transition) {
+            $from = is_array($transition['from']) ? $transition['from'] : [$transition['from']];
+
+            if (in_array($this->currentState(), $from)) {
+                $to = is_array($transition['to']) ? $transition['to'] : [$transition['to']];
+                $definedTransitions = array_merge($definedTransitions, $to);
+            }
+        }
+
+        return array_unique($definedTransitions);
+    }
+
+    /**
+     * @throws Throwable
+     * @throws WorkflowNotFoundException
+     */
+    public function allowedTransitionStates(array $withoutGuards = null): ?array
+    {
+        $allowedTransitionStates = [];
+        $definedTransitionStates = $this->definedTransitionStates($withoutGuards);
+
+        foreach ($definedTransitionStates as $definedTransitionState) {
+            if ($this->canTransitionTo($definedTransitionState)) {
+                $allowedTransitionStates[] = $definedTransitionState;
+            }
+        }
+
+        return $allowedTransitionStates;
     }
 
     public function transitionTo(

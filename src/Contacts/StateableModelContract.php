@@ -69,10 +69,16 @@ interface StateableModelContract
 
     public function canTransitionTo(string $toState, array $withoutGuards = null): bool;
 
+
+    /**
+     * @return array<string>|null
+     */
+    public function definedTransitionStates(array $withoutGuards = null): ?array;
+
     /**
      * @param  array<class-string>|null  $withoutGuards
      */
-    public function allowedTransitions(array $withoutGuards = null): ?array;
+    public function allowedTransitionStates(array $withoutGuards = null): ?array;
 
     /**
      * @param  ?class-string  $byModelType

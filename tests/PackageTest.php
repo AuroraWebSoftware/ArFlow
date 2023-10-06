@@ -45,7 +45,7 @@ beforeEach(function () {
                             ],
                             'transtion2' => [
                                 'from' => ['todo'],
-                                'to' => 'in_progress',
+                                'to' => ['in_progress', 'done'],
                                 'guards' => [
                                     [TestDisallowedTransitionGuard::class, ['permission' => 'represtative_approval']],
                                 ],
@@ -178,7 +178,9 @@ it('a', function () {
     );
 
     $modelInstance->applyWorkflow($workflow);
-    dd($modelInstance->canTransitionTo('in_progress')->allowed());
+    //dd($modelInstance->canTransitionTo('in_progress')->allowed());
+    // dd($modelInstance->definedTransitionStates());
+    dd($modelInstance->allowedTransitionStates());
 
 });
 
