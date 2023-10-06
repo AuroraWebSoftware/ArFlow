@@ -1,6 +1,5 @@
 <?php
 
-
 use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\DTOs\TransitionGuardResultDTO;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
@@ -57,12 +56,12 @@ beforeEach(function () {
                                 'successJob' => [],
                                 'failMetadata' => [],
                                 'failJob' => [],
-                            ]
-                        ]
+                            ],
+                        ],
                     ],
-                    'workflow2' => []
-                ]
-            ]
+                    'workflow2' => [],
+                ],
+            ],
         ]
     );
 
@@ -72,7 +71,6 @@ beforeEach(function () {
         $table->arflow();
         $table->timestamps();
     });
-
 
     /*
     $this->app->singleton('aauth', function ($app) {
@@ -149,7 +147,6 @@ it('can get a WorkflowNotSupportedException', function () {
     $modelInstance->applyWorkflow($workflow);
 })->expectException(WorkflowNotSupportedException::class);
 
-
 it('can make a guard and get the result', function () {
 
     $guard1 = App::make(TestAllowedTransitionGuard::class);
@@ -168,13 +165,10 @@ it('can test', function () {
     $this->assertEquals($guard2->handle()->status, TransitionGuardResultDTO::DISALLOWED);
 });
 
-
 it('a', function () {
-
 
     $name = 'name4';
     $workflow = 'workflow1';
-
 
     /**
      * @var StateableModelContract & Model $modelInstance
@@ -187,7 +181,6 @@ it('a', function () {
     dd($modelInstance->canTransitionTo('in_progress')->allowed());
 
 });
-
 
 it('can create a stateable model instances', function () {
 

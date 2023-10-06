@@ -10,14 +10,12 @@ use Illuminate\Database\Eloquent\Model;
 
 interface TransitionActionContract
 {
-    public function boot(StateableModelContract & Model $model, $from, $to, ...$parameters);
+    public function boot(StateableModelContract&Model $model, $from, $to, ...$parameters);
 
     /**
-     * @return TransitionActionResultDTO
      * @throws WorkflowNotSupportedException
      * @throws TransitionActionException
      * @throws WorkflowNotFoundException
      */
     public function handle(): TransitionActionResultDTO;
-
 }

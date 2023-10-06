@@ -18,9 +18,9 @@ use Throwable;
 
 trait HasState
 {
-
     /**
      * returns all workflows
+     *
      * @return array<string>
      */
     private function getConfigWorkflows(): array
@@ -43,7 +43,7 @@ trait HasState
 
         foreach (Config::get('arflow.workflows') ?? [] as $key => $value) {
             if ($key == $workflow) {
-                return (string)$value['initial_state'];
+                return (string) $value['initial_state'];
             }
         }
 
@@ -53,6 +53,7 @@ trait HasState
     public function getGuarded(): array
     {
         $self = self::class;
+
         return [$self::workflowAttribute(), $self::stateAttribute(), $self::stateMetadataAttribute()];
     }
 
@@ -79,8 +80,6 @@ trait HasState
     }
 
     /**
-     * @param string $workflow
-     * @return bool
      * @throws WorkflowNotFoundException
      * @throws WorkflowNotSupportedException
      * @throws Throwable
@@ -136,6 +135,7 @@ trait HasState
 
     /**
      * @return TransitionGuardResultCollection<string, Collection<TransitionGuardResultDTO>>
+     *
      * @throws WorkflowNotFoundException|Throwable
      */
     public function transitionGuardResults(string $toState, array $withoutGuards = null): TransitionGuardResultCollection
@@ -143,7 +143,7 @@ trait HasState
         $collection = TransitionGuardResultCollection::make();
 
         $appliedWorkflowValue = Config::get('arflow.workflows')[$this->appliedWorkflow()];
-        throw_unless($appliedWorkflowValue, WorkflowNotFoundException::class, $this->appliedWorkflow() . ' Not Found');
+        throw_unless($appliedWorkflowValue, WorkflowNotFoundException::class, $this->appliedWorkflow().' Not Found');
 
         $transitions = $appliedWorkflowValue['transitions'] ?? null;
         throw_unless($transitions, TransitionNotFoundException::class);
@@ -190,11 +190,10 @@ trait HasState
     public function transitionTo(
         string $state, string $comment = null,
         string $byModelType = null, int $byModelId = null,
-        array  $metadata = null,
-        array  $withoutGuards = null,
-        bool   $transitionHistoryAction = true
-    ): bool
-    {
+        array $metadata = null,
+        array $withoutGuards = null,
+        bool $transitionHistoryAction = true
+    ): bool {
 
         //throw new WorkflowNotSupportedException();
         //throw new WorkflowNotFoundException();

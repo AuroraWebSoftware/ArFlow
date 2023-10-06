@@ -6,11 +6,9 @@ use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\Contacts\TransitionGuardContract;
 use AuroraWebSoftware\ArFlow\DTOs\TransitionGuardResultDTO;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Cache;
 
 class TestDisallowedTransitionGuard implements TransitionGuardContract
 {
-
     public function handle(): TransitionGuardResultDTO
     {
         return TransitionGuardResultDTO::build(TransitionGuardResultDTO::DISALLOWED)->addMessage('izin yok');

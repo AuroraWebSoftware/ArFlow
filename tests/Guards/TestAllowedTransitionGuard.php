@@ -9,8 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TestAllowedTransitionGuard implements TransitionGuardContract
 {
-
-    public function boot(StateableModelContract & Model $model, string $from, string $to, array $parameters): void
+    public function boot(StateableModelContract&Model $model, string $from, string $to, array $parameters): void
     {
         // TODO: Implement boot() method.
     }

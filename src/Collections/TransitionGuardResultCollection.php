@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 class TransitionGuardResultCollection extends Collection
 {
     const ALLOWED = 1;
+
     const DISALLOWED = 2;
 
     public function allowed(): bool
