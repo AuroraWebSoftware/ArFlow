@@ -186,7 +186,7 @@ trait HasState
         $definedTransitions = [];
 
         $appliedWorkflowValue = Config::get('arflow.workflows')[$this->appliedWorkflow()];
-        throw_unless($appliedWorkflowValue, WorkflowNotFoundException::class, $this->appliedWorkflow() . ' Not Found');
+        throw_unless($appliedWorkflowValue, WorkflowNotFoundException::class, $this->appliedWorkflow().' Not Found');
 
         $transitions = $appliedWorkflowValue['transitions'] ?? null;
         throw_unless($transitions, TransitionNotFoundException::class);
