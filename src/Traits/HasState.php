@@ -4,12 +4,15 @@ namespace AuroraWebSoftware\ArFlow\Traits;
 
 use AuroraWebSoftware\ArFlow\Collections\TransitionGuardResultCollection;
 use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
+use AuroraWebSoftware\ArFlow\Contacts\TransitionGuardContract;
+use AuroraWebSoftware\ArFlow\DTOs\TransitionGuardResultDTO;
 use AuroraWebSoftware\ArFlow\Exceptions\InitialStateNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\TransitionNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotSupportedException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Throwable;
 
@@ -132,13 +135,12 @@ trait HasState
     }
 
     /**
+     * @return TransitionGuardResultCollection<string, Collection<TransitionGuardResultDTO>>
      * @throws WorkflowNotFoundException|Throwable
      */
-    public function canTransitionTo(string $state, array $withoutGuards = null): TransitionGuardResultCollection
+    public function canTransitionTo(string $toState, array $withoutGuards = null): TransitionGuardResultCollection
     {
-
-        //$collection = TransitionGuardResultCollection::make();
-        $collection = collect();
+        $collection = TransitionGuardResultCollection::make();
 
         $appliedWorkflowValue = Config::get('arflow.workflows')[$this->appliedWorkflow()];
         throw_unless($appliedWorkflowValue, WorkflowNotFoundException::class, $this->appliedWorkflow() . ' Not Found');
@@ -146,27 +148,29 @@ trait HasState
         $transitions = $appliedWorkflowValue['transitions'] ?? null;
         throw_unless($transitions, TransitionNotFoundException::class);
 
-        foreach ($transitions as $transition) {
-            $from = $transition['from'];
+        foreach ($transitions as $transitionKey => $transition) {
+            $from = is_array($transition['from']) ? $transition['from'] : [$transition['from']];
+            $to = is_array($transition['to']) ? $transition['to'] : [$transition['to']];
+            $guards = $transition['guards'];
 
-            if ($this->currentState() == $from || in_array($this->currentState(), $from)) {
+            if (in_array($this->currentState(), $from) and in_array($toState, $to)) {
 
-                foreach () {
-                    $collection->push()
+                $c = collect();
+                foreach ($guards as $guardClass) {
+                    /**
+                     * @var TransitionGuardContract $guardInstance
+                     */
+                    $guardInstance = App::make($guardClass[0]);
+                    $guardInstance->boot($this, $this->currentState(), $toState, $guardClass[1] ?? []);
+                    $c->push($guardInstance->handle());
                 }
 
-            }
+                $collection->put($transitionKey, $c);
 
+            }
         }
 
-        $guard1 = App::make(TestAllowedTransitionGuard::class);
-
-        dd($appliedWorkflow);
-
-        return $collection->allMessages();
-
-        // dd($workflows);
-
+        return $collection;
     }
 
     public function possibleTransitions(array $withoutGuards = null): ?array

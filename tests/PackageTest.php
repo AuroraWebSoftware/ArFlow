@@ -5,6 +5,7 @@ use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\DTOs\TransitionGuardResultDTO;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotSupportedException;
+use AuroraWebSoftware\ArFlow\Tests\Actions\TestSuccessTransitionAction;
 use AuroraWebSoftware\ArFlow\Tests\Guards\TestAllowedTransitionGuard;
 use AuroraWebSoftware\ArFlow\Tests\Guards\TestDisallowedTransitionGuard;
 use AuroraWebSoftware\ArFlow\Tests\Models\Stateable;
@@ -30,13 +31,27 @@ beforeEach(function () {
                         'initial_state' => 'todo',
                         'transitions' => [
                             'transtion1' => [
-                                'from' => ['a'],
-                                'to' => 'b',
-                                'guard' => [
+                                'from' => ['todo'],
+                                'to' => 'in_progress',
+                                'guards' => [
                                     [TestAllowedTransitionGuard::class, ['permission' => 'represtative_approval']],
                                 ],
-                                'action' => [
-                                    [\AuroraWebSoftware\ArFlow\Tests\Actions\TestSuccessTransitionAction::class, ['a' => 'b']],
+                                'actions' => [
+                                    [TestSuccessTransitionAction::class, ['a' => 'b']],
+                                ],
+                                'successMetadata' => ['asd' => 'asd'],
+                                'successJob' => [],
+                                'failMetadata' => [],
+                                'failJob' => [],
+                            ],
+                            'transtion2' => [
+                                'from' => ['todo'],
+                                'to' => 'in_progress',
+                                'guards' => [
+                                    [TestDisallowedTransitionGuard::class, ['permission' => 'represtative_approval']],
+                                ],
+                                'actions' => [
+                                    [TestSuccessTransitionAction::class, ['a' => 'b']],
                                 ],
                                 'successMetadata' => ['asd' => 'asd'],
                                 'successJob' => [],
@@ -156,16 +171,20 @@ it('can test', function () {
 
 it('a', function () {
 
-    $name = 'model name';
+
+    $name = 'name4';
+    $workflow = 'workflow1';
+
 
     /**
-     * @var StateableModelContract $modelInstance
+     * @var StateableModelContract & Model $modelInstance
      */
     $modelInstance = Stateable::create(
         ['name' => $name]
     );
 
-    $modelInstance->canTransitionTo('a');
+    $modelInstance->applyWorkflow($workflow);
+    dd($modelInstance->canTransitionTo('in_progress')->messages());
 
 });
 

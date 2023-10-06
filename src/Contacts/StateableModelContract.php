@@ -2,8 +2,11 @@
 
 namespace AuroraWebSoftware\ArFlow\Contacts;
 
+use AuroraWebSoftware\ArFlow\Collections\TransitionGuardResultCollection;
+use AuroraWebSoftware\ArFlow\DTOs\TransitionGuardResultDTO;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotSupportedException;
+use Illuminate\Support\Collection;
 
 /**
  * Stateable Model
@@ -58,28 +61,27 @@ interface StateableModelContract
     public function currentStateMetadata(): array;
 
     /**
-     * check and return if
-     * @throws WorkflowNotFoundException
-     * @param  array<class-string>|null  $withoutGuards
+     * @return TransitionGuardResultCollection<string, Collection<TransitionGuardResultDTO>>
+     * @throws WorkflowNotFoundException|Throwable
      */
-    public function canTransitionTo(string $state, array $withoutGuards = null): bool;
+    public function canTransitionTo(string $toState, array $withoutGuards = null): TransitionGuardResultCollection;
 
     /**
-     * @param  array<class-string>|null  $withoutGuards
+     * @param array<class-string>|null $withoutGuards
      */
     public function possibleTransitions(array $withoutGuards = null): ?array;
 
     /**
-     * @param  ?class-string  $byModelType
-     * @param  ?int  $byModelId
-     * @param  array<string, mixed>  $metadata
-     * @param  array<class-string>  $withoutGuards
+     * @param  ?class-string $byModelType
+     * @param  ?int $byModelId
+     * @param array<string, mixed> $metadata
+     * @param array<class-string> $withoutGuards
      */
     public function transitionTo(
         string $state, string $comment = null,
         string $byModelType = null, int $byModelId = null,
-        array $metadata = null,
-        array $withoutGuards = null,
-        bool $transitionHistoryAction = true
+        array  $metadata = null,
+        array  $withoutGuards = null,
+        bool   $transitionHistoryAction = true
     ): bool;
 }
