@@ -4,19 +4,18 @@ namespace AuroraWebSoftware\ArFlow\Tests\Guards;
 
 use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\Contacts\TransitionGuardContract;
-use AuroraWebSoftware\ArFlow\DTOs\TransitionGuardReturnDTO;
+use AuroraWebSoftware\ArFlow\DTOs\TransitionGuardResultDTO;
 use Illuminate\Database\Eloquent\Model;
 
 class TestDisallowedTransitionGuard implements TransitionGuardContract
 {
-
-    public function boot(StateableModelContract&Model $model, $from, $to, ...$parameters)
+    public function handle(): TransitionGuardResultDTO
     {
-        // TODO: Implement boot() method.
+        return TransitionGuardResultDTO::build(TransitionGuardResultDTO::DISALLOWED)->addMessage('izin yok');
     }
 
-    public function handle(): TransitionGuardReturnDTO
+    public function boot(StateableModelContract&Model $model, string $from, string $to, array $parameters): void
     {
-        return TransitionGuardReturnDTO::build(TransitionGuardReturnDTO::ALLOWED);
+        // TODO: Implement boot() method.
     }
 }

@@ -2,20 +2,20 @@
 
 namespace AuroraWebSoftware\ArFlow\Contacts;
 
-use AuroraWebSoftware\ArFlow\DTOs\TransitionGuardReturnDTO;
+use AuroraWebSoftware\ArFlow\DTOs\TransitionGuardResultDTO;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotSupportedException;
 use Illuminate\Database\Eloquent\Model;
 
 interface TransitionGuardContract
 {
-    public function boot(StateableModelContract & Model $model, $from, $to, ...$parameters);
+    public function boot(StateableModelContract & Model $model, string $from, string $to, array $parameters): void;
 
     /**
-     * @throws WorkflowNotFoundException
+     * @return TransitionGuardResultDTO
      * @throws WorkflowNotSupportedException
-     * @return TransitionGuardReturnDTO
+     * @throws WorkflowNotFoundException
      */
-    public function handle(): TransitionGuardReturnDTO;
+    public function handle(): TransitionGuardResultDTO;
 
 }

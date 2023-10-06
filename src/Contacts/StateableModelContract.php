@@ -59,7 +59,7 @@ interface StateableModelContract
 
     /**
      * check and return if
-     *
+     * @throws WorkflowNotFoundException
      * @param  array<class-string>|null  $withoutGuards
      */
     public function canTransitionTo(string $state, array $withoutGuards = null): bool;

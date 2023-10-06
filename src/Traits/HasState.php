@@ -2,13 +2,48 @@
 
 namespace AuroraWebSoftware\ArFlow\Traits;
 
-use AuroraWebSoftware\ArFlow\ArFlow;
 use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
+use AuroraWebSoftware\ArFlow\Exceptions\InitialStateNotFoundException;
+use AuroraWebSoftware\ArFlow\Exceptions\TransitionNotFoundException;
+use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
+use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotSupportedException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
+use Throwable;
 
 trait HasState
 {
+
+    /**
+     * returns all workflows
+     * @return array<string>
+     */
+    private function getConfigWorkflows(): array
+    {
+        $workflows = [];
+
+        foreach (Config::get('arflow.workflows') ?? [] as $key => $value) {
+            $workflows[] = $key;
+        }
+
+        return $workflows;
+    }
+
+    /**
+     * @throws InitialStateNotFoundException
+     */
+    private function getInitialState(string $workflow): string
+    {
+        $workflows = [];
+
+        foreach (Config::get('arflow.workflows') ?? [] as $key => $value) {
+            if ($key == $workflow) {
+                return (string)$value['initial_state'];
+            }
+        }
+
+        throw new InitialStateNotFoundException();
+    }
 
     public function getGuarded(): array
     {
@@ -38,16 +73,29 @@ trait HasState
         return 'state_metadata';
     }
 
+    /**
+     * @param string $workflow
+     * @return bool
+     * @throws WorkflowNotFoundException
+     * @throws WorkflowNotSupportedException
+     * @throws Throwable
+     */
     public function applyWorkflow(string $workflow): bool
     {
-        $self = self::class;
-
+        // histroy action eklenecek.
         /**
          * @var Model&StateableModelContract $self
+         * @var Model&StateableModelContract $this
          */
-        return $self->update(
-            ["{$self::workflowAttribute()}" => $workflow]
-        );
+        $self = self::class;
+
+        throw_unless(in_array($workflow, $this->getConfigWorkflows()), WorkflowNotFoundException::class, "$workflow Not Found");
+        throw_unless(in_array($workflow, $self::supportedWorkflows()), WorkflowNotSupportedException::class, "$workflow Not Supported by $self");
+
+        $this->{$self::workflowAttribute()} = $workflow;
+        $this->{$self::stateAttribute()} = $this->getInitialState($workflow);
+
+        return $this->save();
     }
 
     public function appliedWorkflow(): string
@@ -58,7 +106,7 @@ trait HasState
         /**
          * @var Model&StateableModelContract $self
          */
-        return $self->{$self::workflowAttribute()};
+        return $this->getAttribute($self::workflowAttribute());
     }
 
     public function currentState(): string
@@ -68,7 +116,7 @@ trait HasState
         /**
          * @var Model&StateableModelContract $self
          */
-        return $self->{$self::stateAttribute()};
+        return $this->getAttribute($self::stateAttribute());
     }
 
     public function currentStateMetadata(): array
@@ -78,13 +126,36 @@ trait HasState
         /**
          * @var Model&StateableModelContract $self
          */
-        return $self->{$self::stateMetadataAttribute()};
+        return $this->getAttribute($self::stateMetadataAttribute());
     }
 
+    /**
+     * @throws WorkflowNotFoundException|Throwable
+     */
     public function canTransitionTo(string $state, array $withoutGuards = null): bool
     {
-        $workflows = Config::get('arflow.workflows');
-        dd($workflows);
+
+        $appliedWorkflowValue = Config::get('arflow.workflows')[$this->appliedWorkflow()];
+        throw_unless($appliedWorkflowValue, WorkflowNotFoundException::class, $this->appliedWorkflow() . ' Not Found');
+
+        $transitions = $appliedWorkflowValue['transitions'] ?? null;
+        throw_unless($transitions, TransitionNotFoundException::class);
+
+        foreach ($transitions as $transition) {
+            $from = $transition['from'];
+
+            if ($this->currentState() == $from || in_array($this->currentState(), $from)) {
+
+            }
+
+        }
+
+        $guard1 = App::make(TestAllowedTransitionGuard::class);
+
+        dd($appliedWorkflow);
+
+
+        // dd($workflows);
 
     }
 

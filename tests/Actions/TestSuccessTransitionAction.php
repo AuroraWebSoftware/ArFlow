@@ -4,7 +4,7 @@ namespace AuroraWebSoftware\ArFlow\Tests\Actions;
 
 use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\Contacts\TransitionActionContract;
-use AuroraWebSoftware\ArFlow\DTOs\TransitionActionReturnDTO;
+use AuroraWebSoftware\ArFlow\DTOs\TransitionActionResultDTO;
 use Illuminate\Database\Eloquent\Model;
 
 class TestSuccessTransitionAction implements TransitionActionContract
@@ -18,7 +18,7 @@ class TestSuccessTransitionAction implements TransitionActionContract
     /**
      * @inheritDoc
      */
-    public function handle(): TransitionActionReturnDTO
+    public function handle(): TransitionActionResultDTO
     {
         // TODO: Implement handle() method.
     }

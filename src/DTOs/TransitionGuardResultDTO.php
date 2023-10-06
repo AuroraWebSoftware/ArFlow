@@ -2,35 +2,34 @@
 
 namespace AuroraWebSoftware\ArFlow\DTOs;
 
-use Illuminate\Support\Collection;
-
-class TransitionGuardReturnDTO
+class TransitionGuardResultDTO
 {
     const ALLOWED = 1;
     const DISALLOWED = 2;
 
-    public static function build(int $status) : self {
+    public static function build(int $status): self
+    {
         return new self($status);
     }
 
     /**
      * @param int $status
-     * @param Collection|null $messages
+     * @param array<string>|null $messages
      */
     public function __construct(
-        public int         $status,
-        public ?Collection $messages = null,
+        public int    $status,
+        public ?array $messages = [],
     )
     {
     }
 
     /**
      * @param string $message
-     * @return TransitionGuardReturnDTO
+     * @return TransitionGuardResultDTO
      */
-    public function addMessage(string $message) : TransitionGuardReturnDTO
+    public function addMessage(string $message): TransitionGuardResultDTO
     {
-        $this->messages->push($message);
+        $this->messages[] = $message;
         return $this;
     }
 
@@ -43,9 +42,9 @@ class TransitionGuardReturnDTO
     }
 
     /**
-     * @return Collection<string>
+     * @return array<string>
      */
-    public function messages(): Collection
+    public function messages(): array
     {
         return $this->messages;
     }

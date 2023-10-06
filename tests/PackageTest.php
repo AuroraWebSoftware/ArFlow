@@ -1,30 +1,39 @@
 <?php
 
 
+use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
+use AuroraWebSoftware\ArFlow\DTOs\TransitionGuardResultDTO;
+use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
+use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotSupportedException;
+use AuroraWebSoftware\ArFlow\Tests\Guards\TestAllowedTransitionGuard;
+use AuroraWebSoftware\ArFlow\Tests\Guards\TestDisallowedTransitionGuard;
 use AuroraWebSoftware\ArFlow\Tests\Models\Stateable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
 
 beforeEach(function () {
     Artisan::call('migrate:fresh');
-    //$seeder = new SampleDataSeeder();
+    // $seeder = new SampleDataSeeder();
     // $seeder->run();
     // $this->service = new OrganizationService();
 
-    \Illuminate\Support\Facades\Config::set(
+    Config::set(
         [
             'arflow' => [
                 'workflows' => [
                     'workflow1' => [
-                        'states' => ['a', 'b'],
-                        'initial_state' => 'a',
+                        'states' => ['todo', 'b'],
+                        'initial_state' => 'todo',
                         'transitions' => [
                             'transtion1' => [
                                 'from' => ['a'],
                                 'to' => 'b',
                                 'guard' => [
-                                    [\AuroraWebSoftware\ArFlow\Tests\Guards\TestAllowedTransitionGuard::class, ['permission' => 'represtative_approval']],
+                                    [TestAllowedTransitionGuard::class, ['permission' => 'represtative_approval']],
                                 ],
                                 'action' => [
                                     [\AuroraWebSoftware\ArFlow\Tests\Actions\TestSuccessTransitionAction::class, ['a' => 'b']],
@@ -35,8 +44,8 @@ beforeEach(function () {
                                 'failJob' => [],
                             ]
                         ]
-
-                    ]
+                    ],
+                    'workflow2' => []
                 ]
             ]
         ]
@@ -60,26 +69,97 @@ beforeEach(function () {
     */
 });
 
-
 it('can create a stateable model instance', function () {
 
-    $name = 'model name';
+    $name = 'name';
 
+    /**
+     * @var Stateable $modelInstance
+     */
     $modelInstance = Stateable::create(
         ['name' => $name]
     );
 
     $this->assertEquals($modelInstance->name, $name);
-
     $this->assertEquals(Stateable::where('name', $name)->first()->name, $name);
 });
+
+it('can apply a workflow with initial state for a stateable model instance and retrieve', function () {
+
+    $name = 'name1';
+    $workflow = 'workflow1';
+    $initalState = 'todo';
+
+    /**
+     * @var StateableModelContract & Model $modelInstance
+     */
+    $modelInstance = Stateable::create(
+        ['name' => $name]
+    );
+
+    $modelInstance->applyWorkflow($workflow);
+
+    $this->assertEquals($modelInstance->appliedWorkflow(), $workflow);
+    $this->assertEquals($modelInstance->currentState(), $initalState);
+
+});
+
+it('can get a WorkflowNotFound', function () {
+
+    $name = 'name3';
+    $workflow = 'workflow_abc';
+
+    /**
+     * @var StateableModelContract & Model $modelInstance
+     */
+    $modelInstance = Stateable::create(
+        ['name' => $name]
+    );
+
+    $modelInstance->applyWorkflow($workflow);
+})->expectException(WorkflowNotFoundException::class);
+
+it('can get a WorkflowNotSupportedException', function () {
+
+    $name = 'name3';
+    $workflow = 'workflow2';
+
+    /**
+     * @var StateableModelContract & Model $modelInstance
+     */
+    $modelInstance = Stateable::create(
+        ['name' => $name]
+    );
+
+    $modelInstance->applyWorkflow($workflow);
+})->expectException(WorkflowNotSupportedException::class);
+
+
+it('can make a guard and get the result', function () {
+
+    $guard1 = App::make(TestAllowedTransitionGuard::class);
+    $guard2 = App::make(TestDisallowedTransitionGuard::class);
+
+    $this->assertEquals($guard1->handle()->status, TransitionGuardResultDTO::ALLOWED);
+    $this->assertEquals($guard2->handle()->status, TransitionGuardResultDTO::DISALLOWED);
+});
+
+it('can test', function () {
+
+    $guard1 = App::make(TestAllowedTransitionGuard::class);
+    $guard2 = App::make(TestDisallowedTransitionGuard::class);
+
+    $this->assertEquals($guard1->handle()->status, TransitionGuardResultDTO::ALLOWED);
+    $this->assertEquals($guard2->handle()->status, TransitionGuardResultDTO::DISALLOWED);
+});
+
 
 it('a', function () {
 
     $name = 'model name';
 
     /**
-     * @var \AuroraWebSoftware\ArFlow\Contacts\StateableModelContract $modelInstance
+     * @var StateableModelContract $modelInstance
      */
     $modelInstance = Stateable::create(
         ['name' => $name]
@@ -97,7 +177,7 @@ it('can create a stateable model instances', function () {
     );
 
     /**
-     * @var \Illuminate\Database\Eloquent\Model&\AuroraWebSoftware\ArFlow\Contacts\StateableModelContract $modelInstance
+     * @var Model&StateableModelContract $modelInstance
      */
     $modelInstance->applyWorkflow('a');
 
