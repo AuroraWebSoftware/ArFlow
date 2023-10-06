@@ -19,9 +19,9 @@ return [
                     'successJob' => [],
                     'failMetadata' => [],
                     'failJob' => [],
-                ]
-            ]
+                ],
+            ],
 
-        ]
-	]
+        ],
+    ],
 ];

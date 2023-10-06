@@ -13,10 +13,9 @@ class ArFlow
         $this->modelInstance->currentState();
     }
 
-    public function canTransitionTo(string $state, array $withoutGuards = null) : bool
+    public function canTransitionTo(string $state, array $withoutGuards = null): bool
     {
         $workwlowsconfig('arflow.workflows');
-
 
     }
 }
