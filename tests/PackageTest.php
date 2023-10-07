@@ -2,6 +2,7 @@
 
 use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\DTOs\TransitionGuardResultDTO;
+use AuroraWebSoftware\ArFlow\Exceptions\TransitionNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotSupportedException;
 use AuroraWebSoftware\ArFlow\Tests\Actions\TestSuccessTransitionAction;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
+use function PHPUnit\Framework\assertEquals;
 
 beforeEach(function () {
     Artisan::call('migrate:fresh');
@@ -26,7 +28,7 @@ beforeEach(function () {
             'arflow' => [
                 'workflows' => [
                     'workflow1' => [
-                        'states' => ['todo', 'b'],
+                        'states' => ['todo', 'in_progress', 'done', 'cancelled'],
                         'initial_state' => 'todo',
                         'transitions' => [
                             'transtion1' => [
@@ -60,6 +62,10 @@ beforeEach(function () {
                         ],
                     ],
                     'workflow2' => [],
+                    'workflow3' => [
+                        'states' => ['todo', 'in_progress', 'done', 'cancelled'],
+                        'initial_state' => 'todo',
+                    ],
                 ],
             ],
         ]
@@ -156,18 +162,89 @@ it('can make a guard and get the result', function () {
     $this->assertEquals($guard2->handle()->status, TransitionGuardResultDTO::DISALLOWED);
 });
 
-it('can test', function () {
+it('can get transitionGuardResults', function () {
 
-    $guard1 = App::make(TestAllowedTransitionGuard::class);
-    $guard2 = App::make(TestDisallowedTransitionGuard::class);
+    $name = 'name7';
+    $workflow = 'workflow1';
+    $toState = 'in_progress';
 
-    $this->assertEquals($guard1->handle()->status, TransitionGuardResultDTO::ALLOWED);
-    $this->assertEquals($guard2->handle()->status, TransitionGuardResultDTO::DISALLOWED);
+    /**
+     * @var StateableModelContract & Model $modelInstance
+     */
+    $modelInstance = Stateable::create(
+        ['name' => $name]
+    );
+
+    $modelInstance->applyWorkflow($workflow);
+    $resultCollection = $modelInstance->transitionGuardResults($toState);
+    $this->assertEquals($resultCollection->count(), 2);
+    $this->assertEquals($resultCollection->allowed(), TransitionGuardResultDTO::ALLOWED);
+
+    $resultCollection->get('transtion1')
+        ->each(fn(TransitionGuardResultDTO $item) => assertEquals($item->allowed(), true));
+
+    $resultCollection->get('transtion2')
+        ->each(fn(TransitionGuardResultDTO $item) => assertEquals($item->allowed(), false));
 });
 
-it('a', function () {
 
-    $name = 'name4';
+it('can throw WorkflowNotFoundException on transitionGuardResults() without workflow application', function () {
+
+    $name = 'name8';
+    $toState = 'in_progress';
+
+    /**
+     * @var StateableModelContract & Model $modelInstance
+     */
+    $modelInstance = Stateable::create(
+        ['name' => $name]
+    );
+
+    $resultCollection = $modelInstance->transitionGuardResults($toState);
+})->expectException(\AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotAppliedException::class);
+
+it('can throw TransitionNotFoundException on transitionGuardResults() if no transition found', function () {
+
+    $name = 'name9';
+    $workflow = 'workflow3';
+    $toState = 'cancelled';
+
+    /**
+     * @var StateableModelContract & Model $modelInstance
+     */
+    $modelInstance = Stateable::create(
+        ['name' => $name]
+    );
+
+    $modelInstance->applyWorkflow($workflow);
+    $resultCollection = $modelInstance->transitionGuardResults($toState);
+
+    dd($resultCollection);
+
+})->expectException(\AuroraWebSoftware\ArFlow\Exceptions\TransitionNotFoundException::class);
+
+
+it('can check transitionTo States', function () {
+    $name = 'name8';
+    $workflow = 'workflow1';
+    $toState1 = 'in_progress';
+    $toState2 = 'cancelled';
+
+    /**
+     * @var StateableModelContract & Model $modelInstance
+     */
+    $modelInstance = Stateable::create(
+        ['name' => $name]
+    );
+
+    $modelInstance->applyWorkflow($workflow);
+
+    $this->assertTrue($modelInstance->canTransitionTo($toState1));
+    $this->assertFalse($modelInstance->canTransitionTo($toState2));
+});
+
+it('can get all defined transitions', function () {
+    $name = 'name8';
     $workflow = 'workflow1';
 
     /**
@@ -178,28 +255,8 @@ it('a', function () {
     );
 
     $modelInstance->applyWorkflow($workflow);
-    //dd($modelInstance->canTransitionTo('in_progress')->allowed());
-    // dd($modelInstance->definedTransitionStates());
-    dd($modelInstance->allowedTransitionStates());
 
+    dd($modelInstance->definedTransitionStates());
 });
 
-it('can create a stateable model instances', function () {
 
-    $modelInstance = Stateable::create(
-        ['name' => 'a']
-    );
-
-    /**
-     * @var Model&StateableModelContract $modelInstance
-     */
-    $modelInstance->applyWorkflow('a');
-
-    $modelInstance->canTransitionTo('b');
-
-    $modelInstance->possibleTransitions();
-
-    $modelInstance->transitionTo('b');
-
-    $modelInstance->currentState();
-});

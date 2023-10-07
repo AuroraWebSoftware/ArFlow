@@ -8,6 +8,7 @@ use AuroraWebSoftware\ArFlow\Contacts\TransitionGuardContract;
 use AuroraWebSoftware\ArFlow\DTOs\TransitionGuardResultDTO;
 use AuroraWebSoftware\ArFlow\Exceptions\InitialStateNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\TransitionNotFoundException;
+use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotAppliedException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotSupportedException;
 use Illuminate\Database\Eloquent\Model;
@@ -102,6 +103,9 @@ trait HasState
         return $this->save();
     }
 
+    /**
+     * @throws Throwable
+     */
     public function appliedWorkflow(): string
     {
 
@@ -110,7 +114,10 @@ trait HasState
         /**
          * @var Model&StateableModelContract $self
          */
-        return $this->getAttribute($self::workflowAttribute());
+
+        $attribute = $this->getAttribute($self::workflowAttribute());
+        throw_unless($attribute, WorkflowNotAppliedException::class);
+        return $attribute;
     }
 
     public function currentState(): string
@@ -146,6 +153,7 @@ trait HasState
         throw_unless($appliedWorkflowValue, WorkflowNotFoundException::class, $this->appliedWorkflow().' Not Found');
 
         $transitions = $appliedWorkflowValue['transitions'] ?? null;
+
         throw_unless($transitions, TransitionNotFoundException::class);
 
         foreach ($transitions as $transitionKey => $transition) {

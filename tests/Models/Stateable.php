@@ -10,10 +10,10 @@ class Stateable extends Model implements StateableModelContract
 {
     use HasState;
 
-    public string $name;
+
 
     public static function supportedWorkflows(): array
     {
-        return ['workflow1'];
+        return ['workflow1', 'workflow3'];
     }
 }
