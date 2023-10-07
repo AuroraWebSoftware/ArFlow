@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 
 interface TransitionActionContract
 {
-    public function boot(StateableModelContract&Model $model, $from, $to, ...$parameters);
+    public function boot(StateableModelContract&Model $model, string $from, string $to, array $parameters = []): void;
 
     /**
      * @throws WorkflowNotSupportedException

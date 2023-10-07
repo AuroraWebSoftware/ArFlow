@@ -4,6 +4,7 @@ use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\DTOs\TransitionGuardResultDTO;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotSupportedException;
+use AuroraWebSoftware\ArFlow\Tests\Actions\TestFailTransitionAction;
 use AuroraWebSoftware\ArFlow\Tests\Actions\TestSuccessTransitionAction;
 use AuroraWebSoftware\ArFlow\Tests\Guards\TestAllowedTransitionGuard;
 use AuroraWebSoftware\ArFlow\Tests\Guards\TestDisallowedTransitionGuard;
@@ -14,7 +15,6 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
-
 use function PHPUnit\Framework\assertEquals;
 
 beforeEach(function () {
@@ -39,6 +39,8 @@ beforeEach(function () {
                                 ],
                                 'actions' => [
                                     [TestSuccessTransitionAction::class, ['a' => 'b']],
+                                    [TestSuccessTransitionAction::class, ['a' => 'b']],
+                                    [TestFailTransitionAction::class, ['a' => 'b']],
                                 ],
                                 'successMetadata' => ['asd' => 'asd'],
                                 'successJob' => [],
@@ -181,11 +183,12 @@ it('can get transitionGuardResults', function () {
     $this->assertEquals($resultCollection->allowed(), TransitionGuardResultDTO::ALLOWED);
 
     $resultCollection->get('transtion1')
-        ->each(fn (TransitionGuardResultDTO $item) => assertEquals($item->allowed(), true));
+        ->each(fn(TransitionGuardResultDTO $item) => assertEquals($item->allowed(), true));
 
     $resultCollection->get('transtion2')
-        ->each(fn (TransitionGuardResultDTO $item) => assertEquals($item->allowed(), false));
+        ->each(fn(TransitionGuardResultDTO $item) => assertEquals($item->allowed(), false));
 });
+
 
 it('can throw WorkflowNotFoundException on transitionGuardResults() without workflow application', function () {
 
@@ -221,6 +224,7 @@ it('can throw TransitionNotFoundException on transitionGuardResults() if no tran
     dd($resultCollection);
 
 })->expectException(\AuroraWebSoftware\ArFlow\Exceptions\TransitionNotFoundException::class);
+
 
 it('can check transitionTo States', function () {
     $name = 'name8';
@@ -278,3 +282,21 @@ it('can get all allowed transition states', function () {
         ->toHaveCount(2)
         ->toContain('in_progress');
 });
+
+
+it('can transitionto', function () {
+    $name = 'name10';
+    $workflow = 'workflow1';
+
+    /**
+     * @var StateableModelContract & Model $modelInstance
+     */
+    $modelInstance = Stateable::create(
+        ['name' => $name]
+    );
+
+    $modelInstance->applyWorkflow($workflow);
+
+    dd($modelInstance->transitionTo('in_progress'));
+});
+

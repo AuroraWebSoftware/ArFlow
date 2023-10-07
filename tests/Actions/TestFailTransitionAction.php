@@ -7,7 +7,7 @@ use AuroraWebSoftware\ArFlow\Contacts\TransitionActionContract;
 use AuroraWebSoftware\ArFlow\DTOs\TransitionActionResultDTO;
 use Illuminate\Database\Eloquent\Model;
 
-class TestSuccessTransitionAction implements TransitionActionContract
+class TestFailTransitionAction implements TransitionActionContract
 {
     public array $parameters;
     public function boot(StateableModelContract&Model $model, string $from, string $to, array $parameters = []): void
@@ -17,6 +17,6 @@ class TestSuccessTransitionAction implements TransitionActionContract
 
     public function handle(): TransitionActionResultDTO
     {
-        return TransitionActionResultDTO::build(TransitionActionResultDTO::SUCCESS);
+        return TransitionActionResultDTO::build(TransitionActionResultDTO::FAIL);
     }
 }

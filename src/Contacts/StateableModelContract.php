@@ -106,7 +106,7 @@ interface StateableModelContract
      * @throws TransitionActionException
      */
     public function transitionTo(
-        string $state, string $comment = null,
+        string $toState, string $comment = null,
         string $byModelType = null, int $byModelId = null,
         array $metadata = null,
         array $withoutGuards = null,
