@@ -46,7 +46,7 @@ trait HasState
 
         foreach (Config::get('arflow.workflows') ?? [] as $key => $value) {
             if ($key == $workflow) {
-                return (string)$value['initial_state'];
+                return (string) $value['initial_state'];
             }
         }
 
@@ -116,9 +116,9 @@ trait HasState
         /**
          * @var Model&StateableModelContract $self
          */
-
         $attribute = $this->getAttribute($self::workflowAttribute());
         throw_unless($attribute, WorkflowNotAppliedException::class);
+
         return $attribute;
     }
 
@@ -152,7 +152,7 @@ trait HasState
         $collection = TransitionGuardResultCollection::make();
 
         $appliedWorkflowValue = Config::get('arflow.workflows')[$this->appliedWorkflow()];
-        throw_unless($appliedWorkflowValue, WorkflowNotFoundException::class, $this->appliedWorkflow() . ' Not Found');
+        throw_unless($appliedWorkflowValue, WorkflowNotFoundException::class, $this->appliedWorkflow().' Not Found');
 
         $transitions = $appliedWorkflowValue['transitions'] ?? null;
 
@@ -208,7 +208,7 @@ trait HasState
         $definedTransitions = [];
 
         $appliedWorkflowValue = Config::get('arflow.workflows')[$this->appliedWorkflow()];
-        throw_unless($appliedWorkflowValue, WorkflowNotFoundException::class, $this->appliedWorkflow() . ' Not Found');
+        throw_unless($appliedWorkflowValue, WorkflowNotFoundException::class, $this->appliedWorkflow().' Not Found');
 
         $transitions = $appliedWorkflowValue['transitions'] ?? null;
         throw_unless($transitions, TransitionNotFoundException::class);
@@ -244,15 +244,6 @@ trait HasState
     }
 
     /**
-     * @param string $toState
-     * @param string|null $comment
-     * @param string|null $byModelType
-     * @param int|null $byModelId
-     * @param array|null $metadata
-     * @param array|null $withoutGuards
-     * @param string|null $transitionKey
-     * @param bool $transitionHistoryAction
-     * @return bool
      * @throws Throwable
      * @throws TransitionActionException
      * @throws WorkflowNotFoundException
@@ -261,15 +252,14 @@ trait HasState
     public function transitionTo(
         string $toState, string $comment = null,
         string $byModelType = null, int $byModelId = null,
-        array  $metadata = null,
-        array  $withoutGuards = null,
+        array $metadata = null,
+        array $withoutGuards = null,
         string $transitionKey = null,
-        bool   $transitionHistoryAction = true
-    ): bool
-    {
+        bool $transitionHistoryAction = true
+    ): bool {
         // todo tekrar düşünülmeli
         try {
-            if (!$this->canTransitionTo($toState, $withoutGuards)) {
+            if (! $this->canTransitionTo($toState, $withoutGuards)) {
                 return false;
             }
         } catch (Throwable $e) {
@@ -277,7 +267,7 @@ trait HasState
         }
 
         $appliedWorkflowValue = Config::get('arflow.workflows')[$this->appliedWorkflow()];
-        throw_unless($appliedWorkflowValue, WorkflowNotFoundException::class, $this->appliedWorkflow() . ' Not Found');
+        throw_unless($appliedWorkflowValue, WorkflowNotFoundException::class, $this->appliedWorkflow().' Not Found');
 
         $transitions = $appliedWorkflowValue['transitions'] ?? null;
 
@@ -303,7 +293,7 @@ trait HasState
                      */
                     $actionInstance = App::make($actionClass[0]);
                     $actionInstance->boot($this, $this->currentState(), $toState, $actionClass[1] ?? []);
-                    if (!$actionInstance->handle()->executed()) {
+                    if (! $actionInstance->handle()->executed()) {
                         throw new TransitionActionException("$actionClass[0] ");
                     }
                 }
@@ -312,7 +302,7 @@ trait HasState
             }
         }
 
-        if (!$transitionFound) {
+        if (! $transitionFound) {
             // todo exception
         }
 
@@ -325,9 +315,8 @@ trait HasState
         $this->{$self::stateMetadataAttribute()} = [
             'latest_from_state' => $this->currentState(),
             'latest_transition_key' => $transitionKeyItem,
-            'latest_actions' => $actions
+            'latest_actions' => $actions,
         ];
-
 
         return $this->save();
     }
