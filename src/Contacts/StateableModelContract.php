@@ -4,9 +4,11 @@ namespace AuroraWebSoftware\ArFlow\Contacts;
 
 use AuroraWebSoftware\ArFlow\Collections\TransitionGuardResultCollection;
 use AuroraWebSoftware\ArFlow\DTOs\TransitionGuardResultDTO;
+use AuroraWebSoftware\ArFlow\Exceptions\TransitionActionException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotSupportedException;
 use Illuminate\Support\Collection;
+use Throwable;
 
 /**
  * Stateable Model
@@ -72,24 +74,41 @@ interface StateableModelContract
     /**
      * @return array<string>|null
      */
+    public function definedTransitionKeys(array $withoutGuards = null): ?array;
+
+    /**
+     * @param array<class-string>|null $withoutGuards
+     * @throws WorkflowNotFoundException
+     * @throws Throwable
+     */
+    public function allowedTransitionKeys(array $withoutGuards = null): ?array;
+
+
+    /**
+     * @return array<string>|null
+     */
     public function definedTransitionStates(array $withoutGuards = null): ?array;
 
     /**
-     * @param  array<class-string>|null  $withoutGuards
+     * @param array<class-string>|null $withoutGuards
+     * @throws WorkflowNotFoundException
+     * @throws Throwable
      */
     public function allowedTransitionStates(array $withoutGuards = null): ?array;
 
     /**
-     * @param  ?class-string  $byModelType
-     * @param  ?int  $byModelId
-     * @param  array<string, mixed>  $metadata
-     * @param  array<class-string>  $withoutGuards
+     * @param  ?class-string $byModelType
+     * @param  ?int $byModelId
+     * @param array<string, mixed> $metadata
+     * @param array<class-string> $withoutGuards
+     * @throws TransitionActionException
      */
     public function transitionTo(
         string $state, string $comment = null,
         string $byModelType = null, int $byModelId = null,
-        array $metadata = null,
-        array $withoutGuards = null,
-        bool $transitionHistoryAction = true
+        array  $metadata = null,
+        array  $withoutGuards = null,
+        string $transitionKey = null,
+        bool   $transitionHistoryAction = true
     ): bool;
 }

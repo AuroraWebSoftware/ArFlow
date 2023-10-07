@@ -2,7 +2,6 @@
 
 use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\DTOs\TransitionGuardResultDTO;
-use AuroraWebSoftware\ArFlow\Exceptions\TransitionNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotSupportedException;
 use AuroraWebSoftware\ArFlow\Tests\Actions\TestSuccessTransitionAction;
@@ -243,7 +242,7 @@ it('can check transitionTo States', function () {
     $this->assertFalse($modelInstance->canTransitionTo($toState2));
 });
 
-it('can get all defined transitions', function () {
+it('can get all defined transition states', function () {
     $name = 'name8';
     $workflow = 'workflow1';
 
@@ -256,7 +255,29 @@ it('can get all defined transitions', function () {
 
     $modelInstance->applyWorkflow($workflow);
 
-    dd($modelInstance->definedTransitionStates());
+    expect($modelInstance->definedTransitionStates())
+        ->toBeArray()
+        ->toHaveCount(2)
+        ->toContain('in_progress', 'done');
+});
+
+it('can get all allowed transition states', function () {
+    $name = 'name9';
+    $workflow = 'workflow1';
+
+    /**
+     * @var StateableModelContract & Model $modelInstance
+     */
+    $modelInstance = Stateable::create(
+        ['name' => $name]
+    );
+
+    $modelInstance->applyWorkflow($workflow);
+
+    expect($modelInstance->allowedTransitionStates())
+        ->toBeArray()
+        ->toHaveCount(2)
+        ->toContain('in_progress');
 });
 
 

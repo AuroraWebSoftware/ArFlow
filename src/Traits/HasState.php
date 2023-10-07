@@ -7,6 +7,7 @@ use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\Contacts\TransitionGuardContract;
 use AuroraWebSoftware\ArFlow\DTOs\TransitionGuardResultDTO;
 use AuroraWebSoftware\ArFlow\Exceptions\InitialStateNotFoundException;
+use AuroraWebSoftware\ArFlow\Exceptions\TransitionActionException;
 use AuroraWebSoftware\ArFlow\Exceptions\TransitionNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotAppliedException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
@@ -44,7 +45,7 @@ trait HasState
 
         foreach (Config::get('arflow.workflows') ?? [] as $key => $value) {
             if ($key == $workflow) {
-                return (string) $value['initial_state'];
+                return (string)$value['initial_state'];
             }
         }
 
@@ -150,7 +151,7 @@ trait HasState
         $collection = TransitionGuardResultCollection::make();
 
         $appliedWorkflowValue = Config::get('arflow.workflows')[$this->appliedWorkflow()];
-        throw_unless($appliedWorkflowValue, WorkflowNotFoundException::class, $this->appliedWorkflow().' Not Found');
+        throw_unless($appliedWorkflowValue, WorkflowNotFoundException::class, $this->appliedWorkflow() . ' Not Found');
 
         $transitions = $appliedWorkflowValue['transitions'] ?? null;
 
@@ -194,7 +195,7 @@ trait HasState
         $definedTransitions = [];
 
         $appliedWorkflowValue = Config::get('arflow.workflows')[$this->appliedWorkflow()];
-        throw_unless($appliedWorkflowValue, WorkflowNotFoundException::class, $this->appliedWorkflow().' Not Found');
+        throw_unless($appliedWorkflowValue, WorkflowNotFoundException::class, $this->appliedWorkflow() . ' Not Found');
 
         $transitions = $appliedWorkflowValue['transitions'] ?? null;
         throw_unless($transitions, TransitionNotFoundException::class);
@@ -229,13 +230,66 @@ trait HasState
         return $allowedTransitionStates;
     }
 
+    /**
+     * @param string $state
+     * @param string|null $comment
+     * @param string|null $byModelType
+     * @param int|null $byModelId
+     * @param array|null $metadata
+     * @param array|null $withoutGuards
+     * @param bool $transitionHistoryAction
+     * @return bool
+     * @throws TransitionActionException
+     * @throws WorkflowNotFoundException
+     * @throws TransitionNotFoundException
+     *
+     */
     public function transitionTo(
         string $state, string $comment = null,
         string $byModelType = null, int $byModelId = null,
-        array $metadata = null,
-        array $withoutGuards = null,
-        bool $transitionHistoryAction = true
-    ): bool {
+        array  $metadata = null,
+        array  $withoutGuards = null,
+        string $transitionKey = null,
+        bool   $transitionHistoryAction = true
+    ): bool
+    {
+        // todo tekrar düşünülmeli
+        try {
+            if (!$this->canTransitionTo($state, $withoutGuards)) {
+                return false;
+            }
+        } catch (Throwable $e) {
+            throw new TransitionActionException($e->getMessage());
+        }
+
+        $appliedWorkflowValue = Config::get('arflow.workflows')[$this->appliedWorkflow()];
+        throw_unless($appliedWorkflowValue, WorkflowNotFoundException::class, $this->appliedWorkflow() . ' Not Found');
+
+        $transitions = $appliedWorkflowValue['transitions'] ?? null;
+
+        throw_unless($transitions, TransitionNotFoundException::class);
+
+        foreach ($transitions as $transitionKey => $transition) {
+            $from = is_array($transition['from']) ? $transition['from'] : [$transition['from']];
+            $to = is_array($transition['to']) ? $transition['to'] : [$transition['to']];
+            $guards = $transition['guards'];
+
+            if (in_array($this->currentState(), $from) and in_array($state, $to)) {
+
+                $c = collect();
+                foreach ($guards as $guardClass) {
+                    /**
+                     * @var TransitionGuardContract $guardInstance
+                     */
+                    $guardInstance = App::make($guardClass[0]);
+                    $guardInstance->boot($this, $this->currentState(), $toState, $guardClass[1] ?? []);
+                    $c->push($guardInstance->handle());
+                }
+
+                $collection->put($transitionKey, $c);
+            }
+        }
+
 
         //throw new WorkflowNotSupportedException();
         //throw new WorkflowNotFoundException();
