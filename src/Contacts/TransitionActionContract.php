@@ -2,10 +2,8 @@
 
 namespace AuroraWebSoftware\ArFlow\Contacts;
 
-use AuroraWebSoftware\ArFlow\DTOs\TransitionActionResultDTO;
 use AuroraWebSoftware\ArFlow\Exceptions\TransitionActionException;
-use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
-use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotSupportedException;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 
 interface TransitionActionContract
@@ -13,9 +11,9 @@ interface TransitionActionContract
     public function boot(StateableModelContract&Model $model, string $from, string $to, array $parameters = []): void;
 
     /**
-     * @throws WorkflowNotSupportedException
      * @throws TransitionActionException
-     * @throws WorkflowNotFoundException
+     * @throws Exception
      */
-    public function handle(): TransitionActionResultDTO;
+    public function handle(): void;
+    public function failed(): void;
 }

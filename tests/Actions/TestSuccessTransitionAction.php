@@ -4,7 +4,6 @@ namespace AuroraWebSoftware\ArFlow\Tests\Actions;
 
 use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\Contacts\TransitionActionContract;
-use AuroraWebSoftware\ArFlow\DTOs\TransitionActionResultDTO;
 use Illuminate\Database\Eloquent\Model;
 
 class TestSuccessTransitionAction implements TransitionActionContract
@@ -15,8 +14,13 @@ class TestSuccessTransitionAction implements TransitionActionContract
         $this->parameters = $parameters;
     }
 
-    public function handle(): TransitionActionResultDTO
+    public function handle(): void
     {
-        return TransitionActionResultDTO::build(TransitionActionResultDTO::SUCCESS);
+        return;
+    }
+
+    public function failed(): void
+    {
+        // TODO: Implement failed() method.
     }
 }
