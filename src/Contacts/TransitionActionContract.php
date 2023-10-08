@@ -15,5 +15,6 @@ interface TransitionActionContract
      * @throws Exception
      */
     public function handle(): void;
+
     public function failed(): void;
 }

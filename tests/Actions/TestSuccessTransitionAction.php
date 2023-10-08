@@ -17,7 +17,7 @@ class TestSuccessTransitionAction implements TransitionActionContract
 
     public function handle(): void
     {
-        return;
+
     }
 
     public function failed(): void
