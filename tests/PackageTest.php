@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
+
 use function PHPUnit\Framework\assertEquals;
 
 beforeEach(function () {
@@ -183,12 +184,11 @@ it('can get transitionGuardResults', function () {
     $this->assertEquals($resultCollection->allowed(), TransitionGuardResultDTO::ALLOWED);
 
     $resultCollection->get('transtion1')
-        ->each(fn(TransitionGuardResultDTO $item) => assertEquals($item->allowed(), true));
+        ->each(fn (TransitionGuardResultDTO $item) => assertEquals($item->allowed(), true));
 
     $resultCollection->get('transtion2')
-        ->each(fn(TransitionGuardResultDTO $item) => assertEquals($item->allowed(), false));
+        ->each(fn (TransitionGuardResultDTO $item) => assertEquals($item->allowed(), false));
 });
-
 
 it('can throw WorkflowNotFoundException on transitionGuardResults() without workflow application', function () {
 
@@ -224,7 +224,6 @@ it('can throw TransitionNotFoundException on transitionGuardResults() if no tran
     dd($resultCollection);
 
 })->expectException(\AuroraWebSoftware\ArFlow\Exceptions\TransitionNotFoundException::class);
-
 
 it('can check transitionTo States', function () {
     $name = 'name8';
@@ -283,7 +282,6 @@ it('can get all allowed transition states', function () {
         ->toContain('in_progress');
 });
 
-
 it('can transitionto', function () {
     $name = 'name10';
     $workflow = 'workflow1';
@@ -299,4 +297,3 @@ it('can transitionto', function () {
 
     dd($modelInstance->transitionTo('in_progress'));
 });
-

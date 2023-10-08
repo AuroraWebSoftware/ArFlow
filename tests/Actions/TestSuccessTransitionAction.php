@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class TestSuccessTransitionAction implements TransitionActionContract
 {
     public array $parameters;
+
     public function boot(StateableModelContract&Model $model, string $from, string $to, array $parameters = []): void
     {
         $this->parameters = $parameters;
