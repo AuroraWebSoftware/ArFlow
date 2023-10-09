@@ -13,7 +13,7 @@ return [
                         [\AuroraWebSoftware\ArFlow\Tests\Guards\TestAllowedTransitionGuard::class, ['permission' => 'represtative_approval']],
                     ],
                     'action' => [
-                        [\AuroraWebSoftware\ArFlow\Tests\Actions\TestSuccessTransitionAction::class, ['a' => 'b']],
+                        [\AuroraWebSoftware\ArFlow\Tests\TransitionActions\TestSuccessTransitionAction::class, ['a' => 'b']],
                     ],
                     'successMetadata' => ['asd' => 'asd'],
                     'successJob' => [],

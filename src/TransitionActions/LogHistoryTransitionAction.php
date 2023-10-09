@@ -1,12 +1,12 @@
 <?php
 
-namespace AuroraWebSoftware\ArFlow\Tests\Actions;
+namespace AuroraWebSoftware\ArFlow\TransitionActions;
 
 use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\Contacts\TransitionActionContract;
 use Illuminate\Database\Eloquent\Model;
 
-class TestFailTransitionAction implements TransitionActionContract
+class LogHistoryTransitionAction implements TransitionActionContract
 {
     public array $parameters;
 
@@ -17,7 +17,7 @@ class TestFailTransitionAction implements TransitionActionContract
 
     public function handle(): void
     {
-        throw new \Exception();
+        return;
     }
 
     public function failed(): void

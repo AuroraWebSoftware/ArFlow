@@ -48,7 +48,7 @@ interface StateableModelContract
     /**
      * Current model instance's applied workflow
      */
-    public function appliedWorkflow(): string;
+    public function currentWorkflow(): string;
 
     /**
      * Current model instance's current workflow
@@ -111,6 +111,6 @@ interface StateableModelContract
         array $metadata = null,
         array $withoutGuards = null,
         string $transitionKey = null,
-        bool $transitionHistoryAction = true
+        bool $logHistoryTransitionAction = true
     ): bool;
 }

@@ -2,21 +2,23 @@
 
 use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\DTOs\TransitionGuardResultDTO;
+use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotAppliedException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotSupportedException;
-use AuroraWebSoftware\ArFlow\Tests\Actions\TestFailTransitionAction;
-use AuroraWebSoftware\ArFlow\Tests\Actions\TestSuccessTransitionAction;
 use AuroraWebSoftware\ArFlow\Tests\Guards\TestAllowedTransitionGuard;
 use AuroraWebSoftware\ArFlow\Tests\Guards\TestDisallowedTransitionGuard;
+use AuroraWebSoftware\ArFlow\Tests\Jobs\TestTransitionSuccessJob;
 use AuroraWebSoftware\ArFlow\Tests\Models\Stateable;
+use AuroraWebSoftware\ArFlow\Tests\TransitionActions\TestFailTransitionAction;
+use AuroraWebSoftware\ArFlow\Tests\TransitionActions\TestSuccessTransitionAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Schema;
 
-use function PHPUnit\Framework\assertEquals;
 
 beforeEach(function () {
     Artisan::call('migrate:fresh');
@@ -29,39 +31,59 @@ beforeEach(function () {
             'arflow' => [
                 'workflows' => [
                     'workflow1' => [
-                        'states' => ['todo', 'in_progress', 'done', 'cancelled'],
+                        'states' => ['todo', 'in_progress', 'done', 'cancelled', 'in_review', 'on_going'],
                         'initial_state' => 'todo',
                         'transitions' => [
                             'transtion1' => [
                                 'from' => ['todo'],
                                 'to' => 'in_progress',
                                 'guards' => [
-                                    [TestAllowedTransitionGuard::class, ['permission' => 'represtative_approval']],
+                                    [TestAllowedTransitionGuard::class, ['permission' => 'approval']],
                                 ],
                                 'actions' => [
                                     [TestSuccessTransitionAction::class, ['a' => 'b']],
                                     [TestSuccessTransitionAction::class, ['a' => 'b']],
-                                    [TestFailTransitionAction::class, ['a' => 'b']],
                                 ],
-                                'successMetadata' => ['asd' => 'asd'],
-                                'successJob' => [],
-                                'failMetadata' => [],
-                                'failJob' => [],
+                                'success_metadata' => ['asd' => 'asd'],
+                                'success_jobs' => [TestTransitionSuccessJob::class],
                             ],
                             'transtion2' => [
                                 'from' => ['todo'],
                                 'to' => ['in_progress', 'done'],
+                                'guards' => [
+                                    [TestDisallowedTransitionGuard::class, ['permission' => 'approval']],
+                                ],
+                                'actions' => [
+                                    [TestSuccessTransitionAction::class, ['a' => 'b']],
+                                ],
+                                'success_metadata' => ['asd' => 'asd'],
+                                'success_jobs' => [],
+                            ],
+                            'transtion3' => [
+                                'from' => ['todo'],
+                                'to' => ['cancelled'],
                                 'guards' => [
                                     [TestDisallowedTransitionGuard::class, ['permission' => 'represtative_approval']],
                                 ],
                                 'actions' => [
                                     [TestSuccessTransitionAction::class, ['a' => 'b']],
                                 ],
-                                'successMetadata' => ['asd' => 'asd'],
-                                'successJob' => [],
-                                'failMetadata' => [],
-                                'failJob' => [],
+                                'success_metadata' => ['asd' => 'asd'],
+                                'success_jobs' => [],
                             ],
+                            'transtion4' => [
+                                'from' => ['todo'],
+                                'to' => ['in_review'],
+                                'guards' => [
+                                    [TestAllowedTransitionGuard::class],
+                                ],
+                                'actions' => [
+                                    [TestFailTransitionAction::class, ['a' => 'b']],
+                                ],
+                                'success_metadata' => ['asd' => 'asd'],
+                                'success_jobs' => [],
+                            ],
+
                         ],
                     ],
                     'workflow2' => [],
@@ -121,7 +143,7 @@ it('can apply a workflow with initial state for a stateable model instance and r
 
     $modelInstance->applyWorkflow($workflow);
 
-    $this->assertEquals($modelInstance->appliedWorkflow(), $workflow);
+    $this->assertEquals($modelInstance->currentWorkflow(), $workflow);
     $this->assertEquals($modelInstance->currentState(), $initalState);
 
 });
@@ -184,10 +206,10 @@ it('can get transitionGuardResults', function () {
     $this->assertEquals($resultCollection->allowed(), TransitionGuardResultDTO::ALLOWED);
 
     $resultCollection->get('transtion1')
-        ->each(fn (TransitionGuardResultDTO $item) => assertEquals($item->allowed(), true));
+        ->each(fn(TransitionGuardResultDTO $item) => expect($item->allowed())->toBeTrue());
 
     $resultCollection->get('transtion2')
-        ->each(fn (TransitionGuardResultDTO $item) => assertEquals($item->allowed(), false));
+        ->each(fn(TransitionGuardResultDTO $item) => expect($item->allowed())->toBeFalse());
 });
 
 it('can throw WorkflowNotFoundException on transitionGuardResults() without workflow application', function () {
@@ -203,7 +225,7 @@ it('can throw WorkflowNotFoundException on transitionGuardResults() without work
     );
 
     $resultCollection = $modelInstance->transitionGuardResults($toState);
-})->expectException(\AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotAppliedException::class);
+})->expectException(WorkflowNotAppliedException::class);
 
 it('can throw TransitionNotFoundException on transitionGuardResults() if no transition found', function () {
 
@@ -220,8 +242,6 @@ it('can throw TransitionNotFoundException on transitionGuardResults() if no tran
 
     $modelInstance->applyWorkflow($workflow);
     $resultCollection = $modelInstance->transitionGuardResults($toState);
-
-    dd($resultCollection);
 
 })->expectException(\AuroraWebSoftware\ArFlow\Exceptions\TransitionNotFoundException::class);
 
@@ -257,10 +277,11 @@ it('can get all defined transition states', function () {
 
     $modelInstance->applyWorkflow($workflow);
 
+
     expect($modelInstance->definedTransitionStates())
         ->toBeArray()
-        ->toHaveCount(2)
-        ->toContain('in_progress', 'done');
+        ->toHaveCount(4)
+        ->toContain('in_progress', 'done', 'cancelled', 'in_review');
 });
 
 it('can get all allowed transition states', function () {
@@ -276,13 +297,17 @@ it('can get all allowed transition states', function () {
 
     $modelInstance->applyWorkflow($workflow);
 
+
     expect($modelInstance->allowedTransitionStates())
         ->toBeArray()
         ->toHaveCount(2)
-        ->toContain('in_progress');
+        ->toContain('in_progress', 'in_review');
 });
 
 it('can transitionto', function () {
+
+    Queue::fake();
+
     $name = 'name10';
     $workflow = 'workflow1';
 
@@ -295,5 +320,7 @@ it('can transitionto', function () {
 
     $modelInstance->applyWorkflow($workflow);
 
-    dd($modelInstance->transitionTo('in_progress'));
+    $modelInstance->transitionTo('in_progress');
+
+    Queue::assertPushed(TestTransitionSuccessJob::class);
 });

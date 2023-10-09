@@ -1,6 +1,6 @@
 <?php
 
-namespace AuroraWebSoftware\ArFlow\Tests\Actions;
+namespace AuroraWebSoftware\ArFlow\Tests\TransitionActions;
 
 use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\Contacts\TransitionActionContract;

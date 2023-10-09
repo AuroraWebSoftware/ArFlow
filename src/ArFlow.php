@@ -9,7 +9,7 @@ class ArFlow
 {
     public function __construct(private Model&StateableModelContract $modelInstance)
     {
-        $this->modelInstance->appliedWorkflow();
+        $this->modelInstance->currentWorkflow();
         $this->modelInstance->currentState();
     }
 
