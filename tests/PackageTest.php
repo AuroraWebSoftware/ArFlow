@@ -19,7 +19,6 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Schema;
 
-
 beforeEach(function () {
     Artisan::call('migrate:fresh');
     // $seeder = new SampleDataSeeder();
@@ -206,10 +205,10 @@ it('can get transitionGuardResults', function () {
     $this->assertEquals($resultCollection->allowed(), TransitionGuardResultDTO::ALLOWED);
 
     $resultCollection->get('transtion1')
-        ->each(fn(TransitionGuardResultDTO $item) => expect($item->allowed())->toBeTrue());
+        ->each(fn (TransitionGuardResultDTO $item) => expect($item->allowed())->toBeTrue());
 
     $resultCollection->get('transtion2')
-        ->each(fn(TransitionGuardResultDTO $item) => expect($item->allowed())->toBeFalse());
+        ->each(fn (TransitionGuardResultDTO $item) => expect($item->allowed())->toBeFalse());
 });
 
 it('can throw WorkflowNotFoundException on transitionGuardResults() without workflow application', function () {
@@ -277,7 +276,6 @@ it('can get all defined transition states', function () {
 
     $modelInstance->applyWorkflow($workflow);
 
-
     expect($modelInstance->definedTransitionStates())
         ->toBeArray()
         ->toHaveCount(4)
@@ -296,7 +294,6 @@ it('can get all allowed transition states', function () {
     );
 
     $modelInstance->applyWorkflow($workflow);
-
 
     expect($modelInstance->allowedTransitionStates())
         ->toBeArray()
