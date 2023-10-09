@@ -30,7 +30,7 @@ class LogHistoryTransitionAction implements TransitionActionContract
         StateTransition::create([
             'workflow' => $this->model->currentWorkflow(),
             'model_type' => get_class($this->model),
-            'model_id' => $this->model->id,
+            'model_id' => $this->model->getId(),
             'from' => $this->from,
             'to' => $this->to,
             'actor_model_type' => $this->parameters['actor_model_type'],

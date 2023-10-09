@@ -40,6 +40,12 @@ interface StateableModelContract
      */
     public static function supportedWorkflows(): array;
 
+
+    /**
+     * @return int|string
+     */
+    public function getId(): int|string;
+
     /**
      * applies the workflow to the instance
      *

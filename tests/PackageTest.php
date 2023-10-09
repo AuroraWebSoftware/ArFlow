@@ -29,7 +29,7 @@ beforeEach(function () {
 
     // import the CreatePostsTable class from the migration
     include_once __DIR__.'/../database/migrations/create_arflow_history_table.php';
-    (new tt)->up();
+    (new create_arflow_history_table)->up();
 
     Config::set(
         [

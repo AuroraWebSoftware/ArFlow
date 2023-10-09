@@ -4,9 +4,9 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class tt extends Migration
+class create_arflow_history_table extends Migration
 {
-    public function up()
+    public function up() : void
     {
         Schema::create('arflow_state_transitions', function (Blueprint $table) {
             $table->id();
@@ -23,7 +23,7 @@ class tt extends Migration
         });
     }
 
-    public function down()
+    public function down() : void
     {
         Schema::drop('arflow_state_transitions');
     }

@@ -13,3 +13,9 @@ https://github.com/sebdesign/laravel-state-machine
 - config den alınan veriler için bir util class yazılmalı
 - histories tabloları ve actions
 - history testleri
+
+---
+composer analyse
+composer test-coverage
+composer format
+
