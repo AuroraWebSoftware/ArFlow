@@ -25,7 +25,8 @@ use Throwable;
 
 trait HasState
 {
-    public function getId(): int|string {
+    public function getId(): int|string
+    {
         return $this->getAttribute('id');
     }
 

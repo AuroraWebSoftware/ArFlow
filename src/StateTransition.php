@@ -11,13 +11,20 @@ class StateTransition extends Model
     protected $guarded = [];
 
     public int $actor_model_id;
-    public string $actor_model_type;
-    public string $workflow;
-    public string $from;
-    public string $to;
-    public string $comment;
-    public array $metadata;
-    public int $model_id;
-    public string $model_type;
 
+    public string $actor_model_type;
+
+    public string $workflow;
+
+    public string $from;
+
+    public string $to;
+
+    public string $comment;
+
+    public array $metadata;
+
+    public int $model_id;
+
+    public string $model_type;
 }

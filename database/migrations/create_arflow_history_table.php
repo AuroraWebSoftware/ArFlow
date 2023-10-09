@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 class create_arflow_history_table extends Migration
 {
-    public function up() : void
+    public function up(): void
     {
         Schema::create('arflow_state_transitions', function (Blueprint $table) {
             $table->id();
@@ -23,7 +23,7 @@ class create_arflow_history_table extends Migration
         });
     }
 
-    public function down() : void
+    public function down(): void
     {
         Schema::drop('arflow_state_transitions');
     }
