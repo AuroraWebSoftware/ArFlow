@@ -101,15 +101,9 @@ interface StateableModelContract
     public function allowedTransitionStates(array $withoutGuards = null): ?array;
 
     /**
-     * @param string $toState
-     * @param string|null $comment
-     * @param class-string|null $actorModelType
-     * @param int|null $actorModelId
-     * @param array|null $metadata
-     * @param array<class-string>|null $withoutGuards
-     * @param string|null $transitionKey
-     * @param bool $logHistoryTransitionAction
-     * @return bool
+     * @param  class-string|null  $actorModelType
+     * @param  array<class-string>|null  $withoutGuards
+     *
      * @throws StateNotFoundException
      * @throws TransitionActionException
      * @throws TransitionNotFoundException

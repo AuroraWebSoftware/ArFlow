@@ -27,4 +27,4 @@ class tt extends Migration
     {
         Schema::drop('arflow_state_transitions');
     }
-};
+}

@@ -10,8 +10,11 @@ use Illuminate\Database\Eloquent\Model;
 class LogHistoryTransitionAction implements TransitionActionContract
 {
     private array $parameters;
+
     private StateableModelContract&Model $model;
+
     private string $from;
+
     private string $to;
 
     public function boot(StateableModelContract&Model $model, string $from, string $to, array $parameters = []): void

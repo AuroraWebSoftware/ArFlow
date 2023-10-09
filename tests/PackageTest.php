@@ -28,9 +28,8 @@ beforeEach(function () {
     // $this->service = new OrganizationService();
 
     // import the CreatePostsTable class from the migration
-    include_once __DIR__ . '/../database/migrations/create_arflow_history_table.php';
+    include_once __DIR__.'/../database/migrations/create_arflow_history_table.php';
     (new tt)->up();
-
 
     Config::set(
         [
@@ -358,7 +357,6 @@ it('can get TransitionActionException for a disallowed state', function () {
 
 })->expectException(TransitionActionException::class);
 
-
 it('can get WorkflowNotFoundException for a disallowed state', function () {
 
     Queue::fake();
@@ -378,4 +376,3 @@ it('can get WorkflowNotFoundException for a disallowed state', function () {
     $modelInstance->transitionTo($toState);
 
 })->expectException(WorkflowNotFoundException::class);
-

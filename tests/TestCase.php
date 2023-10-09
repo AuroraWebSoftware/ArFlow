@@ -36,8 +36,5 @@ class TestCase extends Orchestra
         // for local tests with mysql
         config()->set('database.default', 'mysql');
 
-
-
-
     }
 }
