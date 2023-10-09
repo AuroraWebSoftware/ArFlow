@@ -4,7 +4,10 @@ namespace AuroraWebSoftware\ArFlow\Contacts;
 
 use AuroraWebSoftware\ArFlow\Collections\TransitionGuardResultCollection;
 use AuroraWebSoftware\ArFlow\DTOs\TransitionGuardResultDTO;
+use AuroraWebSoftware\ArFlow\Exceptions\StateNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\TransitionActionException;
+use AuroraWebSoftware\ArFlow\Exceptions\TransitionNotFoundException;
+use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotAppliedException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotSupportedException;
 use Illuminate\Support\Collection;
@@ -98,16 +101,25 @@ interface StateableModelContract
     public function allowedTransitionStates(array $withoutGuards = null): ?array;
 
     /**
-     * @param  ?class-string  $byModelType
-     * @param  ?int  $byModelId
-     * @param  array<string, mixed>  $metadata
-     * @param  array<class-string>  $withoutGuards
-     *
+     * @param string $toState
+     * @param string|null $comment
+     * @param class-string|null $actorModelType
+     * @param int|null $actorModelId
+     * @param array|null $metadata
+     * @param array<class-string>|null $withoutGuards
+     * @param string|null $transitionKey
+     * @param bool $logHistoryTransitionAction
+     * @return bool
+     * @throws StateNotFoundException
      * @throws TransitionActionException
+     * @throws TransitionNotFoundException
+     * @throws WorkflowNotAppliedException
+     * @throws WorkflowNotFoundException
+     * @throws WorkflowNotSupportedException
      */
     public function transitionTo(
         string $toState, string $comment = null,
-        string $byModelType = null, int $byModelId = null,
+        string $actorModelType = null, int $actorModelId = null,
         array $metadata = null,
         array $withoutGuards = null,
         string $transitionKey = null,

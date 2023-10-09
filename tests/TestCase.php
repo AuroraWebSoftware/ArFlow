@@ -15,6 +15,7 @@ class TestCase extends Orchestra
         Factory::guessFactoryNamesUsing(
             fn (string $modelName) => 'AuroraWebSoftware\\ArFlow\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
+
     }
 
     protected function getPackageProviders($app)
@@ -34,5 +35,9 @@ class TestCase extends Orchestra
 
         // for local tests with mysql
         config()->set('database.default', 'mysql');
+
+
+
+
     }
 }

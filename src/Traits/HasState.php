@@ -19,6 +19,7 @@ use AuroraWebSoftware\ArFlow\TransitionActions\LogHistoryTransitionAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Throwable;
 
@@ -49,7 +50,7 @@ trait HasState
 
         foreach (Config::get('arflow.workflows') ?? [] as $key => $value) {
             if ($key == $workflow) {
-                return (string) $value['initial_state'];
+                return (string)$value['initial_state'];
             }
         }
 
@@ -116,9 +117,19 @@ trait HasState
         $this->{$self::workflowAttribute()} = $workflow;
         $this->{$self::stateAttribute()} = $this->getInitialState($workflow);
 
-        // todo histry action eklenecek. (initial state için)
+        $this->save();
 
-        return $this->save();
+        $historyAction = App::make(LogHistoryTransitionAction::class);
+        $historyAction->boot($this, '', $this->getInitialState($workflow),
+            [
+                'actor_model_type' => null,
+                'actor_model_id' => null,
+            ]
+        );
+        $historyAction->handle();
+
+        return true;
+
     }
 
     /**
@@ -132,7 +143,7 @@ trait HasState
          * @var Model&StateableModelContract $self
          */
         $attribute = $this->getAttribute($self::workflowAttribute());
-        if (! $attribute) {
+        if (!$attribute) {
             throw new WorkflowNotAppliedException;
         }
 
@@ -152,7 +163,7 @@ trait HasState
          * @var Model&StateableModelContract $self
          */
         $attribute = $this->getAttribute($self::stateAttribute());
-        if (! $attribute) {
+        if (!$attribute) {
             throw new StateNotFoundException();
         }
 
@@ -172,7 +183,7 @@ trait HasState
          * @var Model&StateableModelContract $self
          */
         $attribute = $this->getAttribute($self::stateMetadataAttribute());
-        if (! $attribute) {
+        if (!$attribute) {
             throw new StateMetadataNotFoundException();
         }
 
@@ -181,7 +192,6 @@ trait HasState
 
     /**
      * @return TransitionGuardResultCollection<string, Collection<TransitionGuardResultDTO>>
-     *
      * @throws WorkflowNotFoundException
      * @throws TransitionNotFoundException
      * @throws StateNotFoundException
@@ -194,13 +204,13 @@ trait HasState
 
         $workflowValues = Config::get('arflow.workflows')[$this->currentWorkflow()] ?? null;
 
-        if (! $workflowValues) {
-            throw new WorkflowNotFoundException($this->currentWorkflow().' Not Found');
+        if (!$workflowValues) {
+            throw new WorkflowNotFoundException($this->currentWorkflow() . ' Not Found');
         }
 
         $transitionValues = $workflowValues['transitions'] ?? null;
 
-        if (! $transitionValues) {
+        if (!$transitionValues) {
             throw new TransitionNotFoundException;
         }
 
@@ -231,7 +241,7 @@ trait HasState
     /**
      * check if state can transition to a state
      *
-     * @param  ?array  $withoutGuards
+     * @param  ?array $withoutGuards
      *
      * @throws StateNotFoundException
      * @throws TransitionNotFoundException
@@ -268,12 +278,12 @@ trait HasState
 
         $workflowValues = Config::get('arflow.workflows')[$this->currentWorkflow()] ?? null;
 
-        if (! $workflowValues) {
-            throw new WorkflowNotFoundException($this->currentWorkflow().' Not Found');
+        if (!$workflowValues) {
+            throw new WorkflowNotFoundException($this->currentWorkflow() . ' Not Found');
         }
 
         $transitionValues = $workflowValues['transitions'] ?? null;
-        if (! $transitionValues) {
+        if (!$transitionValues) {
             throw new TransitionNotFoundException;
         }
 
@@ -311,6 +321,15 @@ trait HasState
     }
 
     /**
+     * @param string $toState
+     * @param string|null $comment
+     * @param class-string|null $actorModelType
+     * @param int|null $actorModelId
+     * @param array|null $metadata
+     * @param array<class-string>|null $withoutGuards
+     * @param string|null $transitionKey
+     * @param bool $logHistoryTransitionAction
+     * @return bool
      * @throws StateNotFoundException
      * @throws TransitionActionException
      * @throws TransitionNotFoundException
@@ -320,25 +339,25 @@ trait HasState
      */
     public function transitionTo(
         string $toState, string $comment = null,
-        string $byModelType = null, int $byModelId = null,
-        array $metadata = null,
-        array $withoutGuards = null,
+        string $actorModelType = null, int $actorModelId = null,
+        array  $metadata = null,
+        array  $withoutGuards = null,
         string $transitionKey = null,
-        bool $logHistoryTransitionAction = true
-    ): bool {
-        // todo tekrar düşünülmeli
+        bool   $logHistoryTransitionAction = true
+    ): bool
+    {
 
-        if (! $this->canTransitionTo($toState, $withoutGuards)) {
+        if (!$this->canTransitionTo($toState, $withoutGuards)) {
             throw new TransitionActionException();
         }
 
         $workflowValues = Config::get('arflow.workflows')[$this->currentWorkflow()] ?? [];
-        if (! $workflowValues) {
-            throw new WorkflowNotFoundException($this->currentWorkflow().' Not Found');
+        if (!$workflowValues) {
+            throw new WorkflowNotFoundException($this->currentWorkflow() . ' Not Found');
         }
 
         $transitionValues = $workflowValues['transitions'] ?? null;
-        if (! $transitionValues) {
+        if (!$transitionValues) {
             throw new TransitionNotFoundException;
         }
 
@@ -359,7 +378,18 @@ trait HasState
             $actionInstances = [];
 
             if ($logHistoryTransitionAction) {
-                $actions[] = [LogHistoryTransitionAction::class];
+                $actorModelId = $actorModelId ?: Auth::id();
+                $actorModelType = $actorModelType ?: get_class(Auth::user());
+
+                $actions[] = [
+                    LogHistoryTransitionAction::class,
+                    [
+                        'actor_model_type' => $actorModelType,
+                        'actor_model_id' => $actorModelId,
+                        'comment' => $comment,
+                        'metadata' => $metadata
+                    ]
+                ];
             }
 
             if (in_array($this->currentState(), $from) and in_array($toState, $to)) {
@@ -377,7 +407,7 @@ trait HasState
                         foreach ($actionInstances as $actionInstance) {
                             $actionInstance->failed();
                         }
-                        throw new TransitionActionException('Transition Action Failed: '.$e->getMessage());
+                        throw new TransitionActionException('Transition Action Failed: ' . $e->getMessage());
                     }
                 }
 
@@ -390,12 +420,9 @@ trait HasState
             }
         }
 
-        if (! $transitionFound) {
+        if (!$transitionFound) {
             throw new TransitionActionException('Transition Not Found');
         }
-
-        //throw new WorkflowNotSupportedException();
-        //throw new WorkflowNotFoundException();
 
         $self = self::class;
         $this->{$self::stateAttribute()} = $toState;
@@ -406,8 +433,6 @@ trait HasState
         ];
 
         $this->save();
-
-        // job'lar
 
         return true;
     }

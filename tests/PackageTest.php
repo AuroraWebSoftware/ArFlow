@@ -2,6 +2,7 @@
 
 use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\DTOs\TransitionGuardResultDTO;
+use AuroraWebSoftware\ArFlow\Exceptions\TransitionActionException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotAppliedException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotSupportedException;
@@ -20,10 +21,16 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Schema;
 
 beforeEach(function () {
+
     Artisan::call('migrate:fresh');
     // $seeder = new SampleDataSeeder();
     // $seeder->run();
     // $this->service = new OrganizationService();
+
+    // import the CreatePostsTable class from the migration
+    include_once __DIR__ . '/../database/migrations/create_arflow_history_table.php';
+    (new tt)->up();
+
 
     Config::set(
         [
@@ -101,6 +108,14 @@ beforeEach(function () {
         $table->arflow();
         $table->timestamps();
     });
+
+    Schema::create('users', function (Blueprint $table) {
+        $table->id();
+        $table->timestamps();
+    });
+
+    $user = \AuroraWebSoftware\ArFlow\Tests\Models\User::create();
+    $this->actingAs($user);
 
     /*
     $this->app->singleton('aauth', function ($app) {
@@ -301,12 +316,13 @@ it('can get all allowed transition states', function () {
         ->toContain('in_progress', 'in_review');
 });
 
-it('can transitionto', function () {
+it('can transition to an allowed state', function () {
 
     Queue::fake();
 
     $name = 'name10';
     $workflow = 'workflow1';
+    $toState = 'in_progress';
 
     /**
      * @var StateableModelContract & Model $modelInstance
@@ -316,8 +332,50 @@ it('can transitionto', function () {
     );
 
     $modelInstance->applyWorkflow($workflow);
+    $modelInstance->transitionTo($toState);
 
-    $modelInstance->transitionTo('in_progress');
-
+    expect($modelInstance->currentState())->toEqual($toState);
     Queue::assertPushed(TestTransitionSuccessJob::class);
 });
+
+it('can get TransitionActionException for a disallowed state', function () {
+
+    Queue::fake();
+
+    $name = 'name15';
+    $workflow = 'workflow1';
+    $toState = 'cancelled';
+
+    /**
+     * @var StateableModelContract & Model $modelInstance
+     */
+    $modelInstance = Stateable::create(
+        ['name' => $name]
+    );
+
+    $modelInstance->applyWorkflow($workflow);
+    $modelInstance->transitionTo($toState);
+
+})->expectException(TransitionActionException::class);
+
+
+it('can get WorkflowNotFoundException for a disallowed state', function () {
+
+    Queue::fake();
+
+    $name = 'name15';
+    $workflow = 'workflow_notfound';
+    $toState = 'cancelled';
+
+    /**
+     * @var StateableModelContract & Model $modelInstance
+     */
+    $modelInstance = Stateable::create(
+        ['name' => $name]
+    );
+
+    $modelInstance->applyWorkflow($workflow);
+    $modelInstance->transitionTo($toState);
+
+})->expectException(WorkflowNotFoundException::class);
+
