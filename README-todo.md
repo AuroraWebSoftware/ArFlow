@@ -2,7 +2,7 @@ https://github.com/sebdesign/laravel-state-machine
 
 
 ## todo
-- docs
+
 - without guards'ların imlemenet edilmesi
   - testlerin yazılması
 - config den alınan veriler için bir util class yazılmalı
@@ -21,7 +21,7 @@ https://github.com/sebdesign/laravel-state-machine
 - histories tabloları ve actions
 - larastan
 - github unit test ayarları
-
+- docs
 
 ---
 composer analyse
