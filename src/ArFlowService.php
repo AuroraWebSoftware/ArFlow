@@ -33,7 +33,7 @@ class ArFlowService
         throw new WorkflowNotFoundException();
     }
 
-    public function getSupportedModelTypes(string $workflow) : array
+    public function getSupportedModelTypes(string $workflow): array
     {
         return [];
         // workflowun supportded olduğu model ler
@@ -42,11 +42,10 @@ class ArFlowService
     }
 
     /**
-     * @param string $workflow
-     * @param class-string $modelType
+     * @param  class-string  $modelType
      * @return Collection<int, Model>|null
      */
-    public function getModelInstances(string $workflow, string $modelType) : Collection|null
+    public function getModelInstances(string $workflow, string $modelType): ?Collection
     {
         return null;
         // workflow u kullanan modeller
