@@ -5,6 +5,7 @@ namespace AuroraWebSoftware\ArFlow;
 use AuroraWebSoftware\ArFlow\Exceptions\StateNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
 
 class ArFlowService
@@ -32,19 +33,22 @@ class ArFlowService
         throw new WorkflowNotFoundException();
     }
 
-    public function getSupportedModelTypes(string $workflow)
+    public function getSupportedModelTypes(string $workflow) : array
     {
+        return [];
         // workflowun supportded olduğu model ler
         // https://github.com/spatie/laravel-model-info
         // todo akif
     }
 
     /**
-     * @param  class-string  $modelType
-     * @return Collection
+     * @param string $workflow
+     * @param class-string $modelType
+     * @return Collection<int, Model>|null
      */
-    public function getModelInstances(string $workflow, string $modelType)
+    public function getModelInstances(string $workflow, string $modelType) : Collection|null
     {
+        return null;
         // workflow u kullanan modeller
         // todo akif
     }

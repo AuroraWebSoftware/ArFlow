@@ -2,13 +2,12 @@ https://github.com/sebdesign/laravel-state-machine
 
 
 ## todo
-
 - without guards'ların imlemenet edilmesi
   - testlerin yazılması
 - config den alınan veriler için bir util class yazılmalı
 - history testleri
 - kanban boards
-- jobs için de bir interfcae tanımlanması
+
 
 
 ## in progress
@@ -23,6 +22,8 @@ https://github.com/sebdesign/laravel-state-machine
 - larastan
 - github unit test ayarları
 - docs
+- jobs için de bir interfcae tanımlanması
+
 
 ---
 composer analyse
