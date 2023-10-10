@@ -8,6 +8,7 @@ https://github.com/sebdesign/laravel-state-machine
 - config den alınan veriler için bir util class yazılmalı
 - history testleri
 - kanban boards
+- jobs için de bir interfcae tanımlanması
 
 
 ## in progress
