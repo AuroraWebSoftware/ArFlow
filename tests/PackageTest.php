@@ -3,13 +3,16 @@
 use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\DTOs\TransitionGuardResultDTO;
 use AuroraWebSoftware\ArFlow\Exceptions\TransitionActionException;
+use AuroraWebSoftware\ArFlow\Exceptions\TransitionNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotAppliedException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotSupportedException;
+use AuroraWebSoftware\ArFlow\Facades\ArFlow;
 use AuroraWebSoftware\ArFlow\Tests\Guards\TestAllowedTransitionGuard;
 use AuroraWebSoftware\ArFlow\Tests\Guards\TestDisallowedTransitionGuard;
 use AuroraWebSoftware\ArFlow\Tests\Jobs\TestTransitionSuccessJob;
 use AuroraWebSoftware\ArFlow\Tests\Models\Stateable;
+use AuroraWebSoftware\ArFlow\Tests\Models\User;
 use AuroraWebSoftware\ArFlow\Tests\TransitionActions\TestFailTransitionAction;
 use AuroraWebSoftware\ArFlow\Tests\TransitionActions\TestSuccessTransitionAction;
 use Illuminate\Database\Eloquent\Model;
@@ -21,14 +24,9 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Schema;
 
 beforeEach(function () {
-
     Artisan::call('migrate:fresh');
-    // $seeder = new SampleDataSeeder();
-    // $seeder->run();
-    // $this->service = new OrganizationService();
 
-    // import the CreatePostsTable class from the migration
-    include_once __DIR__.'/../database/migrations/create_arflow_history_table.php';
+    include_once __DIR__ . '/../database/migrations/create_arflow_history_table.php';
     (new create_arflow_history_table)->up();
 
     Config::set(
@@ -113,17 +111,9 @@ beforeEach(function () {
         $table->timestamps();
     });
 
-    $user = \AuroraWebSoftware\ArFlow\Tests\Models\User::create();
+    $user = User::create();
     $this->actingAs($user);
 
-    /*
-    $this->app->singleton('aauth', function ($app) {
-        return new \AuroraWebSoftware\AAuth\AAuth(
-            User::find(1),
-            3
-        );
-    });
-    */
 });
 
 it('can create a stateable model instance', function () {
@@ -219,13 +209,13 @@ it('can get transitionGuardResults', function () {
     $this->assertEquals($resultCollection->allowed(), TransitionGuardResultDTO::ALLOWED);
 
     $resultCollection->get('transtion1')
-        ->each(fn (TransitionGuardResultDTO $item) => expect($item->allowed())->toBeTrue());
+        ->each(fn(TransitionGuardResultDTO $item) => expect($item->allowed())->toBeTrue());
 
     $resultCollection->get('transtion2')
-        ->each(fn (TransitionGuardResultDTO $item) => expect($item->allowed())->toBeFalse());
+        ->each(fn(TransitionGuardResultDTO $item) => expect($item->allowed())->toBeFalse());
 });
 
-it('can throw WorkflowNotFoundException on transitionGuardResults() without workflow application', function () {
+it('can throw WorkflowNotAppliedException on transitionGuardResults() without workflow application', function () {
 
     $name = 'name8';
     $toState = 'in_progress';
@@ -256,7 +246,7 @@ it('can throw TransitionNotFoundException on transitionGuardResults() if no tran
     $modelInstance->applyWorkflow($workflow);
     $resultCollection = $modelInstance->transitionGuardResults($toState);
 
-})->expectException(\AuroraWebSoftware\ArFlow\Exceptions\TransitionNotFoundException::class);
+})->expectException(TransitionNotFoundException::class);
 
 it('can check transitionTo States', function () {
     $name = 'name8';
@@ -316,7 +306,6 @@ it('can get all allowed transition states', function () {
 });
 
 it('can transition to an allowed state', function () {
-
     Queue::fake();
 
     $name = 'name10';
@@ -355,6 +344,8 @@ it('can get TransitionActionException for a disallowed state', function () {
     $modelInstance->applyWorkflow($workflow);
     $modelInstance->transitionTo($toState);
 
+    Queue::assertNothingPushed();
+
 })->expectException(TransitionActionException::class);
 
 it('can get WorkflowNotFoundException for a disallowed state', function () {
@@ -376,3 +367,9 @@ it('can get WorkflowNotFoundException for a disallowed state', function () {
     $modelInstance->transitionTo($toState);
 
 })->expectException(WorkflowNotFoundException::class);
+
+it('can get all states of a workflow using Facade', function () {
+    expect(ArFlow::getStates('workflow1'))
+        ->toContain("todo", "in_progress", 'done', 'cancelled', 'in_review', 'on_going')
+        ->toHaveCount(6);
+});
