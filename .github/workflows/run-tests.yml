@@ -67,3 +67,7 @@ jobs:
 
       - name: Execute tests
         run: vendor/bin/pest --ci
+        env:
+          DB_USERNAME: arflow
+          DB_PASSWORD: arflow
+          DB_PORT: ${{ job.services.mysql.ports[3306] }}
