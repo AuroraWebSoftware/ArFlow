@@ -7,6 +7,7 @@ https://github.com/sebdesign/laravel-state-machine
 - config den alınan veriler için bir util class yazılmalı
 - history testleri
 - kanban boards
+- test coverage %90
 
 
 
