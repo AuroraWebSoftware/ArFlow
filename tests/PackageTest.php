@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Schema;
 beforeEach(function () {
     Artisan::call('migrate:fresh');
 
-    include_once __DIR__ . '/../database/migrations/create_arflow_history_table.php';
+    include_once __DIR__.'/../database/migrations/create_arflow_history_table.php';
     (new create_arflow_history_table)->up();
 
     Config::set(
@@ -209,10 +209,10 @@ it('can get transitionGuardResults', function () {
     $this->assertEquals($resultCollection->allowed(), TransitionGuardResultDTO::ALLOWED);
 
     $resultCollection->get('transtion1')
-        ->each(fn(TransitionGuardResultDTO $item) => expect($item->allowed())->toBeTrue());
+        ->each(fn (TransitionGuardResultDTO $item) => expect($item->allowed())->toBeTrue());
 
     $resultCollection->get('transtion2')
-        ->each(fn(TransitionGuardResultDTO $item) => expect($item->allowed())->toBeFalse());
+        ->each(fn (TransitionGuardResultDTO $item) => expect($item->allowed())->toBeFalse());
 });
 
 it('can throw WorkflowNotAppliedException on transitionGuardResults() without workflow application', function () {
@@ -370,6 +370,6 @@ it('can get WorkflowNotFoundException for a disallowed state', function () {
 
 it('can get all states of a workflow using Facade', function () {
     expect(ArFlow::getStates('workflow1'))
-        ->toContain("todo", "in_progress", 'done', 'cancelled', 'in_review', 'on_going')
+        ->toContain('todo', 'in_progress', 'done', 'cancelled', 'in_review', 'on_going')
         ->toHaveCount(6);
 });

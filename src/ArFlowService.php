@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Config;
 
 class ArFlowService
 {
-
     private array $workflows;
 
     public function __construct()
@@ -19,6 +18,7 @@ class ArFlowService
 
     /**
      * @return array<string>
+     *
      * @throws WorkflowNotFoundException
      * @throws StateNotFoundException
      */
@@ -32,22 +32,20 @@ class ArFlowService
         throw new WorkflowNotFoundException();
     }
 
-
-    public function getSupportedModelTypes(string $workflow) {
+    public function getSupportedModelTypes(string $workflow)
+    {
         // workflowun supportded olduğu model ler
         // https://github.com/spatie/laravel-model-info
         // todo akif
     }
 
     /**
-     * @param string $workflow
-     * @param class-string $modelType
+     * @param  class-string  $modelType
      * @return Collection
      */
-    public function getModelInstances(string $workflow, string $modelType) {
+    public function getModelInstances(string $workflow, string $modelType)
+    {
         // workflow u kullanan modeller
         // todo akif
     }
-
-
 }
