@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @see ArFlowService
+ *
  * @method static array<string> getStates(string $workflow)
  */
 class ArFlow extends Facade
