@@ -82,6 +82,8 @@ To use ArFlow in your model, follow these steps:
 
 1. Use the `Stateable` trait in your model class.
 
+This trait provides functionality that allows a model to be a part of a workflow, fetch configurations, get initial states, and perform transitions.
+
 ```php
 use AuroraWebSoftware\ArFlow\Traits\HasState;
 
@@ -95,12 +97,19 @@ class YourModel extends Model
 
 2. Implement the `StateableModelContract` interface in your model class.
 
+This interface ensures your model has the required methods to function as a stateable entity. This includes setting workflow attributes, state attributes, and metadata attributes. You can also determine supported workflows, apply workflows, and make transitions. Below are sample usages:
+
 ```php
 use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 
 class YourModel extends Model implements StateableModelContract
 {
     use HasState;
+
+    public static function supportedWorkflows(): array
+    {
+        return ['workflow1', 'workflow3'];
+    }
 
     // Your model properties and methods
 }
@@ -143,7 +152,18 @@ To apply a workflow to a model instance, use the `applyWorkflow` method:
 ```php
 $model = YourModel::find($id);
 $model->applyWorkflow('workflow_name');
+
 ```
+#### To get the current workflow of a model:
+```php
+$currentWorkflow = $instance->currentWorkflow();
+```
+
+#### To get the current state of a model:
+```php
+$currentState = $instance->currentState();
+````
+
 
 ### Checking Transition States
 
@@ -196,6 +216,22 @@ You can configure your workflows in the `config/arflow.php` file. Define your wo
 ### Sample Configuration
 
 Here's a sample configuration for a workflow:
+
+### Blueprint Macro
+To simplify adding state columns to your migrations, a Blueprint macro is provided:
+This macro `$table->arflow()`  will create three columns: workflow, state, and state_metadata.
+
+```php
+// your_migration.php
+Schema::create('your_model', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->arflow();
+    $table->timestamps();
+});
+```
+
+
 
 ```php
 // config/arflow.php
