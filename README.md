@@ -360,7 +360,24 @@ class TestTransitionSuccessJob extends AbstractTransitionSuccessJob
 
 ```
 
+## Contribution
 
+- php 8.2+
+
+```shell
+docker-compose up -d
+```
+
+```shell
+composer format
+composer analyse
+composer test-coverage
+composer analyse
+```
+
+
+
+---
 This documentation should help you get started with the ArFlow package in your Laravel application. Feel free to explore more features and configurations based on your project's requirements.
 
 For more information, please refer to the package's GitHub repository or contact us for support.
