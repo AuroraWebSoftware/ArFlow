@@ -82,7 +82,7 @@ php artisan migrate
 
 To use ArFlow in your model, follow these steps:
 
-1. Use the `Stateable` trait in your model class.
+1. Use the `HasState` trait in your model class.
 
 This trait provides functionality that allows a model to be a part of a workflow, fetch configurations, get initial states, and perform transitions.
 
