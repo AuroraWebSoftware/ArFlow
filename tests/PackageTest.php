@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Schema;
+use Spatie\ModelInfo\ModelFinder;
 
 beforeEach(function () {
     Artisan::call('migrate:fresh');
@@ -106,6 +107,18 @@ beforeEach(function () {
         $table->timestamps();
     });
 
+    Schema::create('stateablees', function (Blueprint $table) {
+        $table->id();
+        $table->string('name');
+        $table->arflow();
+        $table->timestamps();
+    });
+    Schema::create('helyums', function (Blueprint $table) {
+        $table->id();
+        $table->string('name');
+        $table->arflow();
+        $table->timestamps();
+    });
     Schema::create('users', function (Blueprint $table) {
         $table->id();
         $table->timestamps();
@@ -372,4 +385,58 @@ it('can get all states of a workflow using Facade', function () {
     expect(ArFlow::getStates('workflow1'))
         ->toContain('todo', 'in_progress', 'done', 'cancelled', 'in_review', 'on_going')
         ->toHaveCount(6);
+});
+
+it('can get  retrieve all rows of a given workflow in a model using Facade', function () {
+    $name = 'name1';
+    $workflow = 'workflow1';
+    $initalState = 'todo';
+
+    $name2 = 'name2';
+    $workflow2 = 'workflow3';
+
+    $name3 = 'name3';
+
+    /**
+     * @var StateableModelContract & Model $modelInstance
+     */
+    $modelInstance = Stateable::create(
+        ['name' => $name]
+    );
+    $modelInstance2 = Stateable::create(
+        ['name' => $name2]
+    );
+    $modelInstance3 = Stateable::create(
+        ['name' => $name3]
+    );
+
+    $modelInstance->applyWorkflow($workflow);
+    $modelInstance2->applyWorkflow($workflow2);
+    $modelInstance3->applyWorkflow($workflow2);
+
+    $models = ArFlow::getModelInstances($workflow2,Stateable::class );
+    foreach ($models as $row) {
+        $this->assertEquals($row->workflow ,$workflow2);
+    }
+});
+
+it('can get all models that support a workflow using Facade', function () {
+    $workflow = "workflow1";
+
+    $modelClasses = ModelFinder::all(
+        $this->getTestSupportDirectory(),
+        $this->getTestDirectory(),
+        "AuroraWebSoftware\ArFlow",
+    );
+
+    $supportedModels = ArFlow::getSupportedModelTypes($workflow,$modelClasses);
+
+    if (count($supportedModels) != 0){
+        foreach ($supportedModels as $model){
+            $instance = new $model();
+            $this->assertTrue(in_array($workflow, $instance::supportedWorkflows()));
+        }
+    }else{
+        $this->assertEquals(0, count($supportedModels));
+    }
 });

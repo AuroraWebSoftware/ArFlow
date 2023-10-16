@@ -2,6 +2,7 @@
 
 namespace AuroraWebSoftware\ArFlow;
 
+use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\Exceptions\StateNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use Illuminate\Database\Eloquent\Collection;
@@ -32,20 +33,44 @@ class ArFlowService
         throw new WorkflowNotFoundException();
     }
 
-    public function getSupportedModelTypes(string $workflow)
+    /**
+     * @param string $workflow
+     * @return array
+     */
+    public function getSupportedModelTypes(string $workflow, $models): array
     {
-        // workflowun supportded olduğu model ler
-        // https://github.com/spatie/laravel-model-info
-        // todo akif
+        $modelClasses = $models;
+
+        $supportedModelTypes = [];
+
+        foreach ($modelClasses as $modelClass) {
+            if (in_array(StateableModelContract::class, class_implements($modelClass))) {
+                if (in_array($workflow, $modelClass::supportedWorkflows())){
+                    $supportedModelTypes[] = $modelClass;
+                }
+            }
+        }
+        return $supportedModelTypes;
+
     }
 
     /**
-     * @param  class-string  $modelType
+     * @param string $workflow
+     * @param string $modelType
      * @return Collection
      */
-    public function getModelInstances(string $workflow, string $modelType)
+    public function getModelInstances(string $workflow, string $modelType): Collection
     {
-        // workflow u kullanan modeller
-        // todo akif
+        return $modelType::where('workflow', $workflow)->get();
+    }
+
+    public function getTestSupportDirectory(string $suffix = ''): string
+    {
+        return __DIR__.$suffix;
+    }
+
+    public function getTestDirectory(): string
+    {
+        return realpath($this->getTestSupportDirectory('/..'));
     }
 }
