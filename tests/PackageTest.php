@@ -22,7 +22,6 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Schema;
-use Spatie\ModelInfo\ModelFinder;
 
 beforeEach(function () {
     Artisan::call('migrate:fresh');

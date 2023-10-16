@@ -56,28 +56,16 @@ class ArFlowService
 
     }
 
-    /**
-     * @param string $workflow
-     * @param string $modelType
-     * @return Collection
-     */
     public function getModelInstances(string $workflow, string $modelType): Collection
     {
         return $modelType::where('workflow', $workflow)->get();
     }
 
-    /**
-     * @param string $suffix
-     * @return string
-     */
     public function getTestSupportDirectory(string $suffix = ''): string
     {
         return __DIR__.$suffix;
     }
 
-    /**
-     * @return string|false
-     */
     public function getTestDirectory(): string|false
     {
         return realpath($this->getTestSupportDirectory('/..'));
