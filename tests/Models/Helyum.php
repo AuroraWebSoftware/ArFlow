@@ -2,7 +2,6 @@
 
 namespace AuroraWebSoftware\ArFlow\Tests\Models;
 
-use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\Traits\HasState;
 use Illuminate\Database\Eloquent\Model;
 

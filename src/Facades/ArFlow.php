@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @see ArFlowService
+ *
  * @method Collection getModelInstances(string $workflow, string $modelType)
  * @method array getSupportedModelTypes(string $workflow,Collection $models)
  * @method static array<string> getStates(string $workflow)

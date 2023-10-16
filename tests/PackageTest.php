@@ -414,14 +414,14 @@ it('can get  retrieve all rows of a given workflow in a model using Facade', fun
     $modelInstance2->applyWorkflow($workflow2);
     $modelInstance3->applyWorkflow($workflow2);
 
-    $models = ArFlow::getModelInstances($workflow2,Stateable::class );
+    $models = ArFlow::getModelInstances($workflow2, Stateable::class);
     foreach ($models as $row) {
-        $this->assertEquals($row->workflow ,$workflow2);
+        $this->assertEquals($row->workflow, $workflow2);
     }
 });
 
 it('can get all models that support a workflow using Facade', function () {
-    $workflow = "workflow1";
+    $workflow = 'workflow1';
 
     $modelClasses = ModelFinder::all(
         $this->getTestSupportDirectory(),
@@ -429,14 +429,14 @@ it('can get all models that support a workflow using Facade', function () {
         "AuroraWebSoftware\ArFlow",
     );
 
-    $supportedModels = ArFlow::getSupportedModelTypes($workflow,$modelClasses);
+    $supportedModels = ArFlow::getSupportedModelTypes($workflow, $modelClasses);
 
-    if (count($supportedModels) != 0){
-        foreach ($supportedModels as $model){
+    if (count($supportedModels) != 0) {
+        foreach ($supportedModels as $model) {
             $instance = new $model();
             $this->assertTrue(in_array($workflow, $instance::supportedWorkflows()));
         }
-    }else{
+    } else {
         $this->assertEquals(0, count($supportedModels));
     }
 });
