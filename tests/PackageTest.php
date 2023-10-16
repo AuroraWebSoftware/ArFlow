@@ -417,13 +417,7 @@ it('can get  retrieve all rows of a given workflow in a model using Facade', fun
 it('can get all models that support a workflow using Facade', function () {
     $workflow = 'workflow1';
 
-    $modelClasses = ModelFinder::all(
-        $this->getTestSupportDirectory(),
-        $this->getTestDirectory(),
-        "AuroraWebSoftware\ArFlow",
-    );
-
-    $supportedModels = ArFlow::getSupportedModelTypes($workflow, $modelClasses);
+    $supportedModels = ArFlow::getSupportedModelTypes($workflow);
 
     if (count($supportedModels) != 0) {
         foreach ($supportedModels as $model) {

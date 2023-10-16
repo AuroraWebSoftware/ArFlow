@@ -7,6 +7,7 @@ use AuroraWebSoftware\ArFlow\Exceptions\StateNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Config;
+use Spatie\ModelInfo\ModelFinder;
 
 class ArFlowService
 {
@@ -33,9 +34,13 @@ class ArFlowService
         throw new WorkflowNotFoundException();
     }
 
-    public function getSupportedModelTypes(string $workflow, $models): array
+    public function getSupportedModelTypes(string $workflow): array
     {
-        $modelClasses = $models;
+        $modelClasses = ModelFinder::all(
+            $this->getTestSupportDirectory(),
+            $this->getTestDirectory(),
+            "AuroraWebSoftware\ArFlow",
+        );
 
         $supportedModelTypes = [];
 
@@ -51,17 +56,29 @@ class ArFlowService
 
     }
 
+    /**
+     * @param string $workflow
+     * @param string $modelType
+     * @return Collection
+     */
     public function getModelInstances(string $workflow, string $modelType): Collection
     {
         return $modelType::where('workflow', $workflow)->get();
     }
 
+    /**
+     * @param string $suffix
+     * @return string
+     */
     public function getTestSupportDirectory(string $suffix = ''): string
     {
         return __DIR__.$suffix;
     }
 
-    public function getTestDirectory(): string
+    /**
+     * @return string|false
+     */
+    public function getTestDirectory(): string|false
     {
         return realpath($this->getTestSupportDirectory('/..'));
     }
