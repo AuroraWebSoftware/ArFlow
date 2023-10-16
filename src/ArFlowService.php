@@ -6,6 +6,7 @@ use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\Exceptions\StateNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
 
 class ArFlowService

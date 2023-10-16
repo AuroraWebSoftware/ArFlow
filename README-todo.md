@@ -1,21 +1,30 @@
 https://github.com/sebdesign/laravel-state-machine
 
-- docs
+
+## todo
 - without guards'ların imlemenet edilmesi
   - testlerin yazılması
+- config den alınan veriler için bir util class yazılmalı
+- history testleri
+- kanban boards
+- test coverage %90
+
+
+
+## in progress
 - arflow facade'ı içine
   - workflow's states
   - workflowun supportded olduğu model ler
   - workflow u kullanan modeller
-- config den alınan veriler için bir util class yazılmalı
-- history testleri
-- github unit test ayarları
 
 
---
-done
+## done
 - histories tabloları ve actions
 - larastan
+- github unit test ayarları
+- docs
+- jobs için de bir interfcae tanımlanması
+
 
 ---
 composer analyse

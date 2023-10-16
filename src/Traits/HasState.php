@@ -407,7 +407,7 @@ trait HasState
                 }
 
                 foreach ($successJobs as $successJob) {
-                    $successJob::dispatch();
+                    $successJob::dispatch($this, $this->currentState(), $toState, $action[1] ?? []);
                 }
 
                 $transitionFound = true;

@@ -2,28 +2,16 @@
 
 namespace AuroraWebSoftware\ArFlow\Tests\Jobs;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
+use AuroraWebSoftware\ArFlow\Abstracts\AbstractTransitionSuccessJob;
+use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
+use Illuminate\Database\Eloquent\Model;
 
-class TestTransitionSuccessJob implements ShouldQueue
+class TestTransitionSuccessJob extends AbstractTransitionSuccessJob
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    /**
-     * Create a new job instance.
-     */
-    public function __construct()
-    {
-    }
-
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(StateableModelContract&Model $model, string $from, string $to, array $parameters = []): void
     {
-        // Process uploaded podcast...
     }
 }
