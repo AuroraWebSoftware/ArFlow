@@ -6,7 +6,6 @@ use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\Exceptions\StateNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
 
 class ArFlowService
@@ -34,10 +33,6 @@ class ArFlowService
         throw new WorkflowNotFoundException();
     }
 
-    /**
-     * @param string $workflow
-     * @return array
-     */
     public function getSupportedModelTypes(string $workflow, $models): array
     {
         $modelClasses = $models;
@@ -46,20 +41,16 @@ class ArFlowService
 
         foreach ($modelClasses as $modelClass) {
             if (in_array(StateableModelContract::class, class_implements($modelClass))) {
-                if (in_array($workflow, $modelClass::supportedWorkflows())){
+                if (in_array($workflow, $modelClass::supportedWorkflows())) {
                     $supportedModelTypes[] = $modelClass;
                 }
             }
         }
+
         return $supportedModelTypes;
 
     }
 
-    /**
-     * @param string $workflow
-     * @param string $modelType
-     * @return Collection
-     */
     public function getModelInstances(string $workflow, string $modelType): Collection
     {
         return $modelType::where('workflow', $workflow)->get();
