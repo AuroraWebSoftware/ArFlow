@@ -107,12 +107,6 @@ beforeEach(function () {
         $table->timestamps();
     });
 
-    Schema::create('stateablees', function (Blueprint $table) {
-        $table->id();
-        $table->string('name');
-        $table->arflow();
-        $table->timestamps();
-    });
     Schema::create('helyums', function (Blueprint $table) {
         $table->id();
         $table->string('name');
