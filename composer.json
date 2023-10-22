@@ -1,6 +1,6 @@
 {
     "name": "aurorawebsoftware/arflow",
-    "description": "This is my package arflow",
+    "description": "ArFlow is a Laravel package that allows you to implement workflow management for your Laravel Eloquent models.",
     "keywords": [
         "AuroraWebSoftware",
         "laravel",
