@@ -37,4 +37,14 @@ class TestCase extends Orchestra
         config()->set('database.default', 'mysql');
 
     }
+
+    public function getTestSupportDirectory(string $suffix = ''): string
+    {
+        return __DIR__.$suffix;
+    }
+
+    public function getTestDirectory(): string
+    {
+        return realpath($this->getTestSupportDirectory('/..'));
+    }
 }
