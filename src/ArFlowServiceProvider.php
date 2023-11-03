@@ -20,7 +20,6 @@ class ArFlowServiceProvider extends PackageServiceProvider
             $this->json($stateMetadata)->nullable();
         });
 
-
         // load packages migrations
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
@@ -40,7 +39,6 @@ class ArFlowServiceProvider extends PackageServiceProvider
             ->hasViews()
             //->hasMigration('create_arflow_history_table')
             ->hasCommand(ArFlowCommand::class);
-
 
     }
 }
