@@ -8,8 +8,10 @@ https://github.com/sebdesign/laravel-state-machine
 - history testleri
 - kanban boards
 - test coverage %90
-
-
+- geçişlerde veya fail’lerde event’lerin dispatch edilmesi
+- eğer hiç guard yoksa geçemiyor. geçebilmeli
+- drop column testleri
+- metadata ların kayıt edilip edilememesi test yazılması
 
 ## in progress
 - arflow facade'ı içine

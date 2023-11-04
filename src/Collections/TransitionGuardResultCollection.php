@@ -16,21 +16,28 @@ class TransitionGuardResultCollection extends Collection
 
     public function allowed(): bool
     {
-        $allowed = false;
+        foreach ($this as $collection) {
 
-        $this->each(
-            function (Collection $collection) use (&$allowed) {
-                $collection->each(
-                    function (TransitionGuardResultDTO $transitionGuardResultDTO) use (&$allowed) {
-                        if ($transitionGuardResultDTO->status == TransitionGuardResultDTO::ALLOWED) {
-                            $allowed = true;
-                        }
-                    }
-                );
+            /**
+             * @var Collection<int, TransitionGuardResultDTO> $collection
+             */
+            $allowed = true;
+            foreach ($collection as $transitionGuardResultDTO) {
+
+                /**
+                 * @var TransitionGuardResultDTO $transitionGuardResultDTO
+                 */
+                if ($transitionGuardResultDTO->status == TransitionGuardResultDTO::DISALLOWED) {
+                    $allowed = false;
+                }
             }
-        );
 
-        return $allowed;
+            if ($allowed) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

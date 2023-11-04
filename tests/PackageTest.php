@@ -94,6 +94,32 @@ beforeEach(function () {
                         'states' => ['todo', 'in_progress', 'done', 'cancelled'],
                         'initial_state' => 'todo',
                     ],
+                    'workflow4' => [
+                        'states' => ['todo', 'in_progress', 'done'],
+                        'initial_state' => 'todo',
+                        'transitions' => [
+                            'transtion1' => [
+                                'from' => ['todo'],
+                                'to' => 'in_progress',
+                                'guards' => [],
+                                'actions' => [],
+                                'success_metadata' => ['asd' => 'asd'],
+                                'success_jobs' => [TestTransitionSuccessJob::class],
+                            ],
+                            'transtion2' => [
+                                'from' => ['todo'],
+                                'to' => ['done'],
+                                'guards' => [
+                                    [TestDisallowedTransitionGuard::class, ['permission' => 'represtative_approval']],
+                                ],
+                                'actions' => [
+                                    [TestSuccessTransitionAction::class, ['a' => 'b']],
+                                ],
+                                'success_metadata' => ['asd' => 'asd'],
+                                'success_jobs' => [],
+                            ],
+                        ],
+                    ],
                 ],
             ],
         ]
@@ -206,7 +232,7 @@ it('can get transitionGuardResults', function () {
     $modelInstance->applyWorkflow($workflow);
     $resultCollection = $modelInstance->transitionGuardResults($toState);
     $this->assertEquals($resultCollection->count(), 2);
-    $this->assertEquals($resultCollection->allowed(), TransitionGuardResultDTO::ALLOWED);
+    $this->assertEquals($resultCollection->allowed(), true);
 
     $resultCollection->get('transtion1')
         ->each(fn (TransitionGuardResultDTO $item) => expect($item->allowed())->toBeTrue());
@@ -372,4 +398,25 @@ it('can get all states of a workflow using Facade', function () {
     expect(ArFlow::getStates('workflow1'))
         ->toContain('todo', 'in_progress', 'done', 'cancelled', 'in_review', 'on_going')
         ->toHaveCount(6);
+});
+
+it('can transition to an non-guarded and non actioned state', function () {
+    Queue::fake();
+
+    $name = 'name100';
+    $workflow = 'workflow4';
+    $toState = 'in_progress';
+
+    /**
+     * @var StateableModelContract & Model $modelInstance
+     */
+    $modelInstance = Stateable::create(
+        ['name' => $name]
+    );
+
+    $modelInstance->applyWorkflow($workflow);
+    $modelInstance->transitionTo($toState);
+
+    expect($modelInstance->currentState())->toEqual($toState);
+    Queue::assertPushed(TestTransitionSuccessJob::class);
 });

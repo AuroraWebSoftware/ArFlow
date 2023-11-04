@@ -371,8 +371,8 @@ docker-compose up -d
 ```shell
 composer format
 composer analyse
+composer test
 composer test-coverage
-composer analyse
 ```
 
 

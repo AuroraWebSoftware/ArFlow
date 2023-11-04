@@ -12,6 +12,6 @@ class Stateable extends Model implements StateableModelContract
 
     public static function supportedWorkflows(): array
     {
-        return ['workflow1', 'workflow3'];
+        return ['workflow1', 'workflow3', 'workflow4'];
     }
 }
