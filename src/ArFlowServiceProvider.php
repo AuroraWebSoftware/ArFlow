@@ -20,6 +20,15 @@ class ArFlowServiceProvider extends PackageServiceProvider
             $this->json($stateMetadata)->nullable();
         });
 
+        Blueprint::macro('arflowDown', function (string $workflow = 'workflow', string $state = 'state', string $stateMetadata = 'state_metadata') {
+            /**
+             * @var Blueprint $this
+             */
+            $this->dropColumn($workflow);
+            $this->dropColumn($state);
+            $this->dropColumn($stateMetadata);
+        });
+
         // load packages migrations
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
