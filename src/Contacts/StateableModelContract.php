@@ -72,14 +72,14 @@ interface StateableModelContract
      *
      * @throws WorkflowNotFoundException
      */
-    public function transitionGuardResults(string $toState, ?array $withoutGuards = null): TransitionGuardResultCollection;
+    public function transitionGuardResults(string $toState, array $withoutGuards = null): TransitionGuardResultCollection;
 
-    public function canTransitionTo(string $toState, ?array $withoutGuards = null): bool;
+    public function canTransitionTo(string $toState, array $withoutGuards = null): bool;
 
     /**
      * @return array<string>|null
      */
-    public function definedTransitionKeys(?array $withoutGuards = null): ?array;
+    public function definedTransitionKeys(array $withoutGuards = null): ?array;
 
     /**
      * @param  array<class-string>|null  $withoutGuards
@@ -87,12 +87,12 @@ interface StateableModelContract
      * @throws WorkflowNotFoundException
      * @throws Throwable
      */
-    public function allowedTransitionKeys(?array $withoutGuards = null): ?array;
+    public function allowedTransitionKeys(array $withoutGuards = null): ?array;
 
     /**
      * @return array<string>|null
      */
-    public function definedTransitionStates(?array $withoutGuards = null): ?array;
+    public function definedTransitionStates(array $withoutGuards = null): ?array;
 
     /**
      * @param  array<class-string>|null  $withoutGuards
@@ -100,7 +100,7 @@ interface StateableModelContract
      * @throws WorkflowNotFoundException
      * @throws Throwable
      */
-    public function allowedTransitionStates(?array $withoutGuards = null): ?array;
+    public function allowedTransitionStates(array $withoutGuards = null): ?array;
 
     /**
      * @param  class-string|null  $actorModelType
@@ -114,11 +114,11 @@ interface StateableModelContract
      * @throws WorkflowNotSupportedException
      */
     public function transitionTo(
-        string $toState, ?string $comment = null,
-        ?string $actorModelType = null, ?int $actorModelId = null,
-        ?array $metadata = null,
-        ?array $withoutGuards = null,
-        ?string $transitionKey = null,
+        string $toState, string $comment = null,
+        string $actorModelType = null, int $actorModelId = null,
+        array $metadata = null,
+        array $withoutGuards = null,
+        string $transitionKey = null,
         bool $logHistoryTransitionAction = true
     ): bool;
 }
