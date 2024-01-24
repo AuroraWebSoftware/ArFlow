@@ -8,7 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class TestTransitionSuccessJob extends AbstractTransitionSuccessJob
 {
-    public function __construct(StateableModelContract&Model $model, string $from, string $to, array $metadata = [])
+
+    /**
+     * @param StateableModelContract&Model $model
+     * @param string $from
+     * @param string $to
+     * @param array $parameters
+     */
+    public function __construct(StateableModelContract&Model $model, string $from, string $to, array $parameters = [])
     {
     }
 
