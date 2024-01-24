@@ -8,8 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TestTransitionSuccessJob extends AbstractTransitionSuccessJob
 {
-
-    public function __construct(StateableModelContract&Model $model,string $from,string $to, array $metadata = [])
+    public function __construct(StateableModelContract&Model $model, string $from, string $to, array $metadata = [])
     {
     }
 
@@ -18,6 +17,6 @@ class TestTransitionSuccessJob extends AbstractTransitionSuccessJob
      */
     public function handle(): void
     {
-        echo "Success Job";
+        echo 'Success Job';
     }
 }
