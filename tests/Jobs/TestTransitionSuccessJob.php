@@ -10,9 +10,9 @@ class TestTransitionSuccessJob extends AbstractTransitionSuccessJob
 {
     public function __construct(
         public StateableModelContract&Model $model,
-        public string                       $from,
-        public string                       $to,
-        public array                        $parameters = [])
+        public string $from,
+        public string $to,
+        public array $parameters = [])
     {
     }
 
