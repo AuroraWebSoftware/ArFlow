@@ -49,7 +49,7 @@ beforeEach(function () {
                                 ],
                                 'success_metadata' => ['asd' => 'asd'],
                                 'success_jobs' => [
-                                    [TestTransitionSuccessJob::class , ['aa' => 1]]
+                                    [TestTransitionSuccessJob::class, ['aa' => 1]],
                                 ],
                             ],
                             'transtion2' => [
@@ -107,7 +107,7 @@ beforeEach(function () {
                                 'actions' => [],
                                 'success_metadata' => ['asd' => 'asd'],
                                 'success_jobs' => [
-                                    [TestTransitionSuccessJob::class , ['aaa' => 1]]
+                                    [TestTransitionSuccessJob::class, ['aaa' => 1]],
                                 ],
                             ],
                             'transtion2' => [
