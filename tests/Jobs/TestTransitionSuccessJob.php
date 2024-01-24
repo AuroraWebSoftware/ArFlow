@@ -15,7 +15,7 @@ use Illuminate\Queue\SerializesModels;
 class TestTransitionSuccessJob extends AbstractTransitionSuccessJob
 {
 
-    public function __construct(StateableModelContract&Model $model,string $from,string $to,array $parameters = [], array $metadata = [])
+    public function __construct(StateableModelContract&Model $model,string $from,string $to, array $metadata = [])
     {
     }
 

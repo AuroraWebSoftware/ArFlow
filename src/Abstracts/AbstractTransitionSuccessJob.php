@@ -22,7 +22,7 @@ abstract class AbstractTransitionSuccessJob implements ShouldQueue
      * @param array $parameters
      * @param array $metadata
      */
-    public function __construct(StateableModelContract&Model $model, string $from, string $to, array $parameters = [], array $metadata = [])
+    public function __construct(StateableModelContract&Model $model, string $from, string $to, array $parameters = [])
     {
     }
 
