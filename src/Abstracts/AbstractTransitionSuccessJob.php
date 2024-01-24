@@ -15,7 +15,11 @@ abstract class AbstractTransitionSuccessJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(StateableModelContract&Model $model, string $from, string $to, array $parameters = [])
+    public function __construct(
+        public StateableModelContract&Model $model,
+        public string                       $from,
+        public string                       $to,
+        public array                        $parameters = [])
     {
     }
 
