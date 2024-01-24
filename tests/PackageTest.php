@@ -48,7 +48,9 @@ beforeEach(function () {
                                     [TestSuccessTransitionAction::class, ['a' => 'b']],
                                 ],
                                 'success_metadata' => ['asd' => 'asd'],
-                                'success_jobs' => [TestTransitionSuccessJob::class],
+                                'success_jobs' => [
+                                    [TestTransitionSuccessJob::class , ['aa' => 1]]
+                                ],
                             ],
                             'transtion2' => [
                                 'from' => ['todo'],
@@ -104,7 +106,9 @@ beforeEach(function () {
                                 'guards' => [],
                                 'actions' => [],
                                 'success_metadata' => ['asd' => 'asd'],
-                                'success_jobs' => [TestTransitionSuccessJob::class],
+                                'success_jobs' => [
+                                    [TestTransitionSuccessJob::class , ['aaa' => 1]]
+                                ],
                             ],
                             'transtion2' => [
                                 'from' => ['todo'],

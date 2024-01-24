@@ -15,14 +15,21 @@ abstract class AbstractTransitionSuccessJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct()
+    /**
+     * @param StateableModelContract&Model $model
+     * @param string $from
+     * @param string $to
+     * @param array $parameters
+     * @param array $metadata
+     */
+    public function __construct(StateableModelContract&Model $model, string $from, string $to, array $parameters = [], array $metadata = [])
     {
     }
 
     /**
      * @throws NotImplementedException
      */
-    public function handle(StateableModelContract&Model $model, string $from, string $to, array $parameters = []): void
+    public function handle(): void
     {
         throw new NotImplementedException();
     }

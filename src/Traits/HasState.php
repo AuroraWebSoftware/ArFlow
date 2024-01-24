@@ -201,7 +201,7 @@ trait HasState
      * @throws WorkflowNotSupportedException
      * @throws WorkflowNotAppliedException
      */
-    public function transitionGuardResults(string $toState, ?array $withoutGuards = null): TransitionGuardResultCollection
+    public function transitionGuardResults(string $toState, array $withoutGuards = null): TransitionGuardResultCollection
     {
         $resultCollection = TransitionGuardResultCollection::make();
 
@@ -251,18 +251,18 @@ trait HasState
      * @throws WorkflowNotFoundException
      * @throws WorkflowNotSupportedException
      */
-    public function canTransitionTo(string $toState, ?array $withoutGuards = null): bool
+    public function canTransitionTo(string $toState, array $withoutGuards = null): bool
     {
         return $this->transitionGuardResults($toState, $withoutGuards)->allowed();
     }
 
-    public function definedTransitionKeys(?array $withoutGuards = null): ?array
+    public function definedTransitionKeys(array $withoutGuards = null): ?array
     {
         // TODO: Implement definedTransitionKeys() method.
         // testleri yazılacak
     }
 
-    public function allowedTransitionKeys(?array $withoutGuards = null): ?array
+    public function allowedTransitionKeys(array $withoutGuards = null): ?array
     {
         // TODO: Implement allowedTransitionKeys() method.
         // testleri yazılacak
@@ -274,7 +274,7 @@ trait HasState
      * @throws WorkflowNotFoundException
      * @throws TransitionNotFoundException
      */
-    public function definedTransitionStates(?array $withoutGuards = null): ?array
+    public function definedTransitionStates(array $withoutGuards = null): ?array
     {
         $definedTransitionStates = [];
 
@@ -308,7 +308,7 @@ trait HasState
      * @throws WorkflowNotFoundException
      * @throws WorkflowNotSupportedException
      */
-    public function allowedTransitionStates(?array $withoutGuards = null): ?array
+    public function allowedTransitionStates(array $withoutGuards = null): ?array
     {
         $allowedTransitionStates = [];
         $definedTransitionStates = $this->definedTransitionStates($withoutGuards);
@@ -334,11 +334,11 @@ trait HasState
      * @throws WorkflowNotSupportedException
      */
     public function transitionTo(
-        string $toState, ?string $comment = null,
-        ?string $actorModelType = null, ?int $actorModelId = null,
-        ?array $metadata = null,
-        ?array $withoutGuards = null,
-        ?string $transitionKey = null,
+        string $toState, string $comment = null,
+        string $actorModelType = null, int $actorModelId = null,
+        array $metadata = null,
+        array $withoutGuards = null,
+        string $transitionKey = null,
         bool $logHistoryTransitionAction = true
     ): bool {
 
@@ -406,8 +406,8 @@ trait HasState
                     }
                 }
 
-                foreach ($successJobs as $key => $successJob) {
-                    dispatch(new $successJob[0]($this, $this->currentState(), $toState, $action[1] ?? []));
+                foreach ($successJobs as $successJob) {
+                    dispatch(new $successJob[0]($this, $this->currentState(), $toState, $action[1] ?? [], $successJob[1] ?? []));
                 }
 
                 $transitionFound = true;
