@@ -103,9 +103,6 @@ interface StateableModelContract
      */
     public function allowedTransitionStates(?array $withoutGuards = null): ?array;
 
-    /**
-     * @return DateTime|null
-     */
     public function lastUpdatedTime(): ?DateTime;
 
     /**

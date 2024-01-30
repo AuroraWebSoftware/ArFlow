@@ -325,7 +325,6 @@ trait HasState
     }
 
     /**
-     * @return DateTime|null
      * @throws WorkflowNotAppliedException
      */
     public function lastUpdatedTime(): ?DateTime
@@ -333,7 +332,7 @@ trait HasState
         return StateTransition::where([
             'workflow' => $this->currentWorkflow(),
             'model_type' => self::class,
-            'model_id' => $this->id
+            'model_id' => $this->id,
         ])->orderBy('id', 'desc')?->first()?->updated_at;
     }
 
