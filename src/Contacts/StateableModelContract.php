@@ -104,9 +104,9 @@ interface StateableModelContract
     public function allowedTransitionStates(?array $withoutGuards = null): ?array;
 
     /**
-     * @return DateTime
+     * @return DateTime|null
      */
-    public function lastUpdatedTime(): DateTime;
+    public function lastUpdatedTime(): ?DateTime;
 
     /**
      * @param  class-string|null  $actorModelType

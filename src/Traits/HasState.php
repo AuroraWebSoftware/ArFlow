@@ -17,6 +17,7 @@ use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotSupportedException;
 use AuroraWebSoftware\ArFlow\StateTransition;
 use AuroraWebSoftware\ArFlow\TransitionActions\LogHistoryTransitionAction;
+use DateTime;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
@@ -323,13 +324,17 @@ trait HasState
         return $allowedTransitionStates;
     }
 
-    public function lastUpdatedTime():\DateTime
+    /**
+     * @return DateTime|null
+     * @throws WorkflowNotAppliedException
+     */
+    public function lastUpdatedTime(): ?DateTime
     {
         return StateTransition::where([
             'workflow' => $this->currentWorkflow(),
             'model_type' => self::class,
             'model_id' => $this->id
-        ])->orderBy('id', 'desc')->first()->updated_at;
+        ])->orderBy('id', 'desc')?->first()?->updated_at;
     }
 
     /**

@@ -438,7 +438,7 @@ it('can transition to an non-guarded and non actioned state', function () {
     Queue::assertPushed(TestTransitionSuccessJob::class);
 });
 
-it('can get transitionGuardResults_', function () {
+it('can get lastUpdatedTime', function () {
 
     Queue::fake();
 
