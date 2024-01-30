@@ -323,12 +323,12 @@ trait HasState
         return $allowedTransitionStates;
     }
 
-    public function lastUpdatedTime():\DateTime
+    public function lastUpdatedTime(): \DateTime
     {
         return StateTransition::where([
             'workflow' => $this->currentWorkflow(),
             'model_type' => self::class,
-            'model_id' => $this->id
+            'model_id' => $this->id,
         ])->orderBy('id', 'desc')->first()->updated_at;
     }
 
