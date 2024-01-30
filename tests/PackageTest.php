@@ -8,6 +8,7 @@ use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotAppliedException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotSupportedException;
 use AuroraWebSoftware\ArFlow\Facades\ArFlow;
+use AuroraWebSoftware\ArFlow\StateTransition;
 use AuroraWebSoftware\ArFlow\Tests\Guards\TestAllowedTransitionGuard;
 use AuroraWebSoftware\ArFlow\Tests\Guards\TestDisallowedTransitionGuard;
 use AuroraWebSoftware\ArFlow\Tests\Jobs\TestTransitionSuccessJob;
@@ -84,6 +85,18 @@ beforeEach(function () {
                                 ],
                                 'actions' => [
                                     [TestFailTransitionAction::class, ['a' => 'b']],
+                                ],
+                                'success_metadata' => ['asd' => 'asd'],
+                                'success_jobs' => [],
+                            ],
+                            'transtion5' => [
+                                'from' => ['in_progress'],
+                                'to' => ['todo'],
+                                'guards' => [
+                                    [TestAllowedTransitionGuard::class],
+                                ],
+                                'actions' => [
+                                    [TestSuccessTransitionAction::class, ['a' => 'b']],
                                 ],
                                 'success_metadata' => ['asd' => 'asd'],
                                 'success_jobs' => [],
@@ -423,4 +436,38 @@ it('can transition to an non-guarded and non actioned state', function () {
 
     expect($modelInstance->currentState())->toEqual($toState);
     Queue::assertPushed(TestTransitionSuccessJob::class);
+});
+
+it('can get transitionGuardResults_', function () {
+
+    Queue::fake();
+
+    $name = 'name8';
+    $workflow = 'workflow1';
+    $toState = 'in_progress';
+    $toState2 = 'todo';
+
+    /**
+     * @var StateableModelContract & Model $modelInstance
+     */
+    $modelInstance = Stateable::create(
+        ['name' => $name]
+    );
+
+    $modelInstance->applyWorkflow($workflow);
+    $modelInstance->transitionTo($toState);
+    $resultCollection = $modelInstance->transitionGuardResults($toState);
+
+    $modelInstance->transitionTo($toState2);
+    $resultCollection = $modelInstance->transitionGuardResults($toState2);
+
+        $lastDate = StateTransition::where([
+            'workflow' => 'workflow1',
+            'model_type' => Stateable::class,
+            'model_id' => $modelInstance->id
+        ])->orderBy('id', 'desc')->first()->updated_at->format('Y-m-d H:i:s');
+
+    expect( $modelInstance->lastUpdatedTime()->format('Y-m-d H:i:s'))->toBe($lastDate);
+    Queue::assertPushed(TestTransitionSuccessJob::class);
+
 });

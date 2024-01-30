@@ -10,6 +10,7 @@ use AuroraWebSoftware\ArFlow\Exceptions\TransitionNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotAppliedException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotFoundException;
 use AuroraWebSoftware\ArFlow\Exceptions\WorkflowNotSupportedException;
+use DateTime;
 use Illuminate\Support\Collection;
 use Throwable;
 
@@ -101,6 +102,11 @@ interface StateableModelContract
      * @throws Throwable
      */
     public function allowedTransitionStates(?array $withoutGuards = null): ?array;
+
+    /**
+     * @return DateTime
+     */
+    public function lastUpdatedTime(): DateTime;
 
     /**
      * @param  class-string|null  $actorModelType
