@@ -461,13 +461,13 @@ it('can get lastUpdatedTime', function () {
     $modelInstance->transitionTo($toState2);
     $resultCollection = $modelInstance->transitionGuardResults($toState2);
 
-        $lastDate = StateTransition::where([
-            'workflow' => 'workflow1',
-            'model_type' => Stateable::class,
-            'model_id' => $modelInstance->id
-        ])->orderBy('id', 'desc')->first()->updated_at->format('Y-m-d H:i:s');
+    $lastDate = StateTransition::where([
+        'workflow' => 'workflow1',
+        'model_type' => Stateable::class,
+        'model_id' => $modelInstance->id,
+    ])->orderBy('id', 'desc')->first()->updated_at->format('Y-m-d H:i:s');
 
-    expect( $modelInstance->lastUpdatedTime()->format('Y-m-d H:i:s'))->toBe($lastDate);
+    expect($modelInstance->lastUpdatedTime()->format('Y-m-d H:i:s'))->toBe($lastDate);
     Queue::assertPushed(TestTransitionSuccessJob::class);
 
 });
