@@ -2,6 +2,7 @@
 
 namespace AuroraWebSoftware\ArFlow\Traits;
 
+use AuroraWebSoftware\AAuth\Facades\AAuth;
 use AuroraWebSoftware\ArFlow\Collections\TransitionGuardResultCollection;
 use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\Contacts\TransitionActionContract;
@@ -396,7 +397,7 @@ trait HasState
                         'actor_model_type' => $actorModelType,
                         'actor_model_id' => $actorModelId,
                         'comment' => $comment,
-                        'metadata' => $metadata,
+                        'metadata' => json_encode($metadata, JSON_UNESCAPED_UNICODE),
                     ],
                 ];
             }
@@ -419,9 +420,18 @@ trait HasState
                         throw new TransitionActionException('Transition Action Failed: '.$e->getMessage());
                     }
                 }
-
                 foreach ($successJobs as $successJob) {
-                    dispatch(new $successJob[0]($this, $this->currentState(), $toState, $successJob[1] ?? []));
+
+                    $userId = null;
+                    if (Auth::check() && isset($metadata['userId']) && isset($metadata['roleId'])) {
+                        $userId = $metadata['userId'];
+                        if (isset($successJob[1]) && is_array($successJob[1])) {
+                            $successJobParameter = array_merge($successJob[1], ['userId' => $metadata['userId'],'roleId' => $metadata['roleId']]);
+                        } else {
+                            $successJobParameter =['userId' => $metadata['userId'],'roleId' => $metadata['roleId']];
+                        }
+                    }
+                    dispatch(new $successJob[0]($this, $this->currentState(), $toState, $successJobParameter ?? []));
                 }
 
                 $transitionFound = true;
