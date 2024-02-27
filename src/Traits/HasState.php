@@ -2,7 +2,6 @@
 
 namespace AuroraWebSoftware\ArFlow\Traits;
 
-use AuroraWebSoftware\AAuth\Facades\AAuth;
 use AuroraWebSoftware\ArFlow\Collections\TransitionGuardResultCollection;
 use AuroraWebSoftware\ArFlow\Contacts\StateableModelContract;
 use AuroraWebSoftware\ArFlow\Contacts\TransitionActionContract;
@@ -426,9 +425,9 @@ trait HasState
                     if (Auth::check() && isset($metadata['userId']) && isset($metadata['roleId'])) {
                         $userId = $metadata['userId'];
                         if (isset($successJob[1]) && is_array($successJob[1])) {
-                            $successJobParameter = array_merge($successJob[1], ['userId' => $metadata['userId'],'roleId' => $metadata['roleId']]);
+                            $successJobParameter = array_merge($successJob[1], ['userId' => $metadata['userId'], 'roleId' => $metadata['roleId']]);
                         } else {
-                            $successJobParameter =['userId' => $metadata['userId'],'roleId' => $metadata['roleId']];
+                            $successJobParameter = ['userId' => $metadata['userId'], 'roleId' => $metadata['roleId']];
                         }
                     }
                     dispatch(new $successJob[0]($this, $this->currentState(), $toState, $successJobParameter ?? []));
