@@ -396,7 +396,7 @@ trait HasState
                         'actor_model_type' => $actorModelType,
                         'actor_model_id' => $actorModelId,
                         'comment' => $comment,
-                        'metadata' => $metadata,
+                        'metadata' => (is_array($metadata)) ? json_encode($metadata, JSON_UNESCAPED_UNICODE) : $metadata,
                     ],
                 ];
             }
@@ -421,7 +421,14 @@ trait HasState
                 }
 
                 foreach ($successJobs as $successJob) {
-                    dispatch(new $successJob[0]($this, $this->currentState(), $toState, $successJob[1] ?? []));
+
+                    if (is_array($metadata) && isset($successJob[1]) && is_array($successJob[1])) {
+                        $successJobParameter = array_merge($successJob[1], $metadata);
+                    } else {
+                        $successJobParameter = $metadata;
+                    }
+
+                    dispatch(new $successJob[0]($this, $this->currentState(), $toState, $successJobParameter ?? []));
                 }
 
                 $transitionFound = true;
