@@ -422,8 +422,8 @@ trait HasState
 
                 foreach ($successJobs as $successJob) {
 
-                    if (is_array($metadata) && isset($successJob[1]) && is_array($successJob[1])) {
-                        $successJobParameter = array_merge($successJob[1], $metadata);
+                    if (isset($successJob[1]) && is_array($successJob[1])) {
+                        $successJobParameter = array_merge($successJob[1], $metadata ?? []);
                     } else {
                         $successJobParameter = $metadata;
                     }
