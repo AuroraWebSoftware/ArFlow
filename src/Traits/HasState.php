@@ -65,7 +65,7 @@ trait HasState
 
     public function getGuarded(): array
     {
-        $self = self::class;
+        $self = static::class;
 
         return [$self::workflowAttribute(), $self::stateAttribute(), $self::stateMetadataAttribute()];
     }
@@ -108,7 +108,7 @@ trait HasState
          * @var Model&StateableModelContract $self
          * @var Model&StateableModelContract $this
          */
-        $self = self::class;
+        $self = static::class;
 
         if (! in_array($workflow, $this->getConfigWorkflows())) {
             throw new WorkflowNotFoundException("$workflow Not Found");
@@ -141,7 +141,7 @@ trait HasState
      */
     public function currentWorkflow(): string
     {
-        $self = self::class;
+        $self = static::class;
 
         /**
          * @var Model&StateableModelContract $self
@@ -161,7 +161,7 @@ trait HasState
      */
     public function currentState(): string
     {
-        $self = self::class;
+        $self = static::class;
 
         /**
          * @var Model&StateableModelContract $self
@@ -181,7 +181,7 @@ trait HasState
      */
     public function currentStateMetadata(): array
     {
-        $self = self::class;
+        $self = static::class;
 
         /**
          * @var Model&StateableModelContract $self
@@ -330,7 +330,7 @@ trait HasState
     {
         return StateTransition::where([
             'workflow' => $this->currentWorkflow(),
-            'model_type' => self::class,
+            'model_type' => static::class,
             'model_id' => $this->id,
         ])->orderBy('id', 'desc')?->first()?->updated_at;
     }
@@ -439,7 +439,7 @@ trait HasState
             throw new TransitionActionException('Transition Not Found');
         }
 
-        $self = self::class;
+        $self = static::class;
         $this->{$self::stateAttribute()} = $toState;
         $this->{$self::stateMetadataAttribute()} = [
             'latest_from_state' => $this->currentState(),
