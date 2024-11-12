@@ -4,6 +4,4 @@ namespace AuroraWebSoftware\ArFlow\Exceptions;
 
 use Exception;
 
-class StateNotFoundException extends Exception
-{
-}
+class StateNotFoundException extends Exception {}

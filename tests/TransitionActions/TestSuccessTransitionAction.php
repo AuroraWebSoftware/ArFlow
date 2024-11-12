@@ -15,10 +15,7 @@ class TestSuccessTransitionAction implements TransitionActionContract
         $this->parameters = $parameters;
     }
 
-    public function handle(): void
-    {
-
-    }
+    public function handle(): void {}
 
     public function failed(): void
     {

@@ -12,9 +12,7 @@ class TestTransitionSuccessJob extends AbstractTransitionSuccessJob
         public StateableModelContract&Model $model,
         public string $from,
         public string $to,
-        public array $parameters = [])
-    {
-    }
+        public array $parameters = []) {}
 
     /**
      * Execute the job.

@@ -27,10 +27,10 @@ class ArFlowService
     {
         foreach ($this->workflows as $workflowKey => $workflowValues) {
             if ($workflowKey == $workflow) {
-                return $workflowValues['states'] ?? throw new StateNotFoundException();
+                return $workflowValues['states'] ?? throw new StateNotFoundException;
             }
         }
-        throw new WorkflowNotFoundException();
+        throw new WorkflowNotFoundException;
     }
 
     public function getSupportedModelTypes(string $workflow): array

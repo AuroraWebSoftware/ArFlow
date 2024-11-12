@@ -19,15 +19,13 @@ abstract class AbstractTransitionSuccessJob implements ShouldQueue
         public StateableModelContract&Model $model,
         public string $from,
         public string $to,
-        public array $parameters = [])
-    {
-    }
+        public array $parameters = []) {}
 
     /**
      * @throws NotImplementedException
      */
     public function handle(): void
     {
-        throw new NotImplementedException();
+        throw new NotImplementedException;
     }
 }

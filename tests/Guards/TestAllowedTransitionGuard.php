@@ -10,9 +10,7 @@ use Illuminate\Log\Logger;
 
 class TestAllowedTransitionGuard implements TransitionGuardContract
 {
-    public function __construct(public Logger $logger)
-    {
-    }
+    public function __construct(public Logger $logger) {}
 
     public function boot(StateableModelContract&Model $model, string $from, string $to, array $parameters): void
     {
