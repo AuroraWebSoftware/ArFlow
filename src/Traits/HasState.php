@@ -60,7 +60,7 @@ trait HasState
             }
         }
 
-        throw new InitialStateNotFoundException();
+        throw new InitialStateNotFoundException;
     }
 
     public function getGuarded(): array
@@ -168,7 +168,7 @@ trait HasState
          */
         $attribute = $this->getAttribute($self::stateAttribute());
         if (! $attribute) {
-            throw new StateNotFoundException();
+            throw new StateNotFoundException;
         }
 
         return $attribute;
@@ -188,7 +188,7 @@ trait HasState
          */
         $attribute = $this->getAttribute($self::stateMetadataAttribute());
         if (! $attribute) {
-            throw new StateMetadataNotFoundException();
+            throw new StateMetadataNotFoundException;
         }
 
         return $this->getAttribute($self::stateMetadataAttribute());
@@ -245,7 +245,6 @@ trait HasState
     /**
      * check if state can transition to a state
      *
-     * @param  ?array  $withoutGuards
      *
      * @throws StateNotFoundException
      * @throws TransitionNotFoundException
@@ -357,7 +356,7 @@ trait HasState
     ): bool {
 
         if (! $this->canTransitionTo($toState, $withoutGuards)) {
-            throw new TransitionActionException();
+            throw new TransitionActionException;
         }
 
         $workflowValues = Config::get('arflow.workflows')[$this->currentWorkflow()] ?? [];
@@ -422,8 +421,8 @@ trait HasState
 
                 foreach ($successJobs as $successJob) {
 
-                    if (is_array($metadata) && isset($successJob[1]) && is_array($successJob[1])) {
-                        $successJobParameter = array_merge($successJob[1], $metadata);
+                    if (isset($successJob[1]) && is_array($successJob[1])) {
+                        $successJobParameter = array_merge($successJob[1], $metadata ?? []);
                     } else {
                         $successJobParameter = $metadata;
                     }

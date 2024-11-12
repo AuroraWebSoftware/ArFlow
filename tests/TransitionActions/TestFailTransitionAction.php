@@ -17,7 +17,7 @@ class TestFailTransitionAction implements TransitionActionContract
 
     public function handle(): void
     {
-        throw new \Exception();
+        throw new \Exception;
     }
 
     public function failed(): void

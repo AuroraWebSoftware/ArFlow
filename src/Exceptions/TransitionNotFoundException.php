@@ -4,6 +4,4 @@ namespace AuroraWebSoftware\ArFlow\Exceptions;
 
 use Exception;
 
-class TransitionNotFoundException extends Exception
-{
-}
+class TransitionNotFoundException extends Exception {}
