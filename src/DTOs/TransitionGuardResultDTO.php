@@ -19,8 +19,7 @@ class TransitionGuardResultDTO
     public function __construct(
         public int $status,
         public ?array $messages = [],
-    ) {
-    }
+    ) {}
 
     public function addMessage(string $message): TransitionGuardResultDTO
     {
