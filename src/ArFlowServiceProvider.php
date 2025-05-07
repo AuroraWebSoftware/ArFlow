@@ -46,7 +46,7 @@ class ArFlowServiceProvider extends PackageServiceProvider
             ->name('arflow')
             ->hasConfigFile('arflow')
             ->hasViews()
-            //->hasMigration('create_arflow_history_table')
+            // ->hasMigration('create_arflow_history_table')
             ->hasCommand(ArFlowCommand::class);
 
     }
