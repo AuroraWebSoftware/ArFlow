@@ -27,8 +27,8 @@ use Illuminate\Support\Facades\Schema;
 beforeEach(function () {
     Artisan::call('migrate:fresh');
 
-    //include_once __DIR__.'/../database/migrations/create_arflow_history_table.php';
-    //(new create_arflow_history_table)->up();
+    // include_once __DIR__.'/../database/migrations/create_arflow_history_table.php';
+    // (new create_arflow_history_table)->up();
 
     Config::set(
         [
