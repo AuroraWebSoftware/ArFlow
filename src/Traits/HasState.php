@@ -24,6 +24,9 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 
+/**
+ * @phpstan-ignore-next-line
+ */
 trait HasState
 {
     public function getId(): int|string

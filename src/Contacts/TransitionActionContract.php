@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 
 interface TransitionActionContract
 {
+    /**
+     * @param array<string, mixed> $parameters
+     */
     public function boot(StateableModelContract&Model $model, string $from, string $to, array $parameters = []): void;
 
     /**

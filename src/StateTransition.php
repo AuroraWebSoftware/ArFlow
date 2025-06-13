@@ -22,6 +22,7 @@ class StateTransition extends Model
 
     public string $comment;
 
+    /** @var array<string, mixed> */
     public array $metadata;
 
     public int $model_id;

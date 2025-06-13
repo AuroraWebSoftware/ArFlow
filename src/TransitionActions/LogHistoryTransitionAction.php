@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class LogHistoryTransitionAction implements TransitionActionContract
 {
+    /** @var array<string, mixed> */
     private array $parameters;
 
     private StateableModelContract&Model $model;
@@ -17,6 +18,9 @@ class LogHistoryTransitionAction implements TransitionActionContract
 
     private string $to;
 
+    /**
+     * @param array<string, mixed> $parameters
+     */
     public function boot(StateableModelContract&Model $model, string $from, string $to, array $parameters = []): void
     {
         $this->model = $model;

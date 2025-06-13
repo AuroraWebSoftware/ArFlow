@@ -6,7 +6,7 @@ use AuroraWebSoftware\ArFlow\DTOs\TransitionGuardResultDTO;
 use Illuminate\Support\Collection;
 
 /**
- * @extends Collection<string, TransitionGuardResultCollection<TransitionGuardResultDTO>>
+ * @extends Collection<string, Collection<int, TransitionGuardResultDTO>>
  */
 class TransitionGuardResultCollection extends Collection
 {
