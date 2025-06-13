@@ -1,0 +1,525 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# ArFlow Package Rules
+
+## Overview
+ArFlow is a Laravel package for managing state transitions in Eloquent models through workflows, guards, actions, and success jobs. 
+Its a state machine.
+
+## Core Concepts
+
+### 1. Workflows
+Workflows define the possible states and transitions for a model. Each workflow consists of:
+- States: Possible states a model can be in
+- Initial State: Starting state when workflow is applied
+- Transitions: Rules for moving between states
+
+```php
+// config/arflow.php
+return [
+    'workflows' => [
+        'task_workflow' => [
+            'states' => ['todo', 'in_progress', 'in_review', 'done', 'cancelled'],
+            'initial_state' => 'todo',
+            'transitions' => [
+                'start_work' => [
+                    'from' => ['todo'],
+                    'to' => 'in_progress',
+                    'guards' => [
+                        [TaskPermissionGuard::class, ['permission' => 'task_approval']],
+                    ],
+                    'actions' => [
+                        [TaskNotificationAction::class, ['type' => 'work_started']],
+                    ],
+                    'success_metadata' => ['started_at' => now()],
+                    'success_jobs' => [
+                        [TaskAuditLogJob::class, ['action' => 'work_started']],
+                    ],
+                ],
+                'submit_for_review' => [
+                    'from' => ['in_progress'],
+                    'to' => 'in_review',
+                    'guards' => [
+                        [TaskCompletionGuard::class, ['required_fields' => ['description', 'assigned_to']]],
+                    ],
+                    'actions' => [
+                        [TaskNotificationAction::class, ['type' => 'review_requested']],
+                    ],
+                    'success_metadata' => ['submitted_at' => now()],
+                    'success_jobs' => [
+                        [TaskAuditLogJob::class, ['action' => 'review_requested']],
+                    ],
+                ],
+                'complete' => [
+                    'from' => ['in_review'],
+                    'to' => 'done',
+                    'guards' => [
+                        [TaskReviewGuard::class, ['role' => 'reviewer']],
+                    ],
+                    'actions' => [
+                        [TaskNotificationAction::class, ['type' => 'task_completed']],
+                    ],
+                    'success_metadata' => ['completed_at' => now()],
+                    'success_jobs' => [
+                        [TaskAuditLogJob::class, ['action' => 'task_completed']],
+                    ],
+                ],
+                'cancel' => [
+                    'from' => ['todo', 'in_progress', 'in_review'],
+                    'to' => 'cancelled',
+                    'guards' => [
+                        [TaskPermissionGuard::class, ['permission' => 'task_cancel']],
+                    ],
+                    'actions' => [
+                        [TaskNotificationAction::class, ['type' => 'task_cancelled']],
+                    ],
+                    'success_metadata' => ['cancelled_at' => now()],
+                    'success_jobs' => [
+                        [TaskAuditLogJob::class, ['action' => 'task_cancelled']],
+                    ],
+                ],
+                'reopen' => [
+                    'from' => ['done', 'cancelled'],
+                    'to' => 'todo',
+                    'guards' => [
+                        [TaskPermissionGuard::class, ['permission' => 'task_reopen']],
+                    ],
+                    'actions' => [
+                        [TaskNotificationAction::class, ['type' => 'task_reopened']],
+                    ],
+                    'success_metadata' => ['reopened_at' => now()],
+                    'success_jobs' => [
+                        [TaskAuditLogJob::class, ['action' => 'task_reopened']],
+                    ],
+                ],
+            ],
+        ],
+    ],
+];
+```
+
+### 2. Guards
+Guards validate whether a transition can occur. They implement `TransitionGuardContract` and:
+- Check permissions
+- Validate business rules
+- Ensure prerequisites are met
+
+```php
+class TaskPermissionGuard implements TransitionGuardContract
+{
+    private StateableModelContract $model;
+    private string $from;
+    private string $to;
+    private array $parameters;
+
+    public function boot(StateableModelContract&Model $model, string $from, string $to, array $parameters): void
+    {
+        $this->model = $model;
+        $this->from = $from;
+        $this->to = $to;
+        $this->parameters = $parameters;
+    }
+
+    public function handle(): TransitionGuardResultDTO
+    {
+        // Check if user has required permission
+        if (!auth()->user()->hasPermission($this->parameters['permission'])) {
+            return TransitionGuardResultDTO::build(
+                TransitionGuardResultDTO::DENIED,
+                'User does not have required permission'
+            );
+        }
+
+        // Check if task is assigned
+        if (!$this->model->assigned_to) {
+            return TransitionGuardResultDTO::build(
+                TransitionGuardResultDTO::DENIED,
+                'Task must be assigned before starting work'
+            );
+        }
+
+        return TransitionGuardResultDTO::build(TransitionGuardResultDTO::ALLOWED);
+    }
+}
+```
+
+### 3. Actions
+Actions perform tasks during transitions. They implement `TransitionActionContract` and:
+- Execute side effects
+- Update related models
+- Send notifications
+
+```php
+class TaskNotificationAction implements TransitionActionContract
+{
+    private StateableModelContract $model;
+    private string $from;
+    private string $to;
+    private array $parameters;
+
+    public function boot(StateableModelContract&Model $model, string $from, string $to, array $parameters = []): void
+    {
+        $this->model = $model;
+        $this->from = $from;
+        $this->to = $to;
+        $this->parameters = $parameters;
+    }
+
+    public function handle(): void
+    {
+        // Notify task assignee
+        if ($this->model->assigned_to) {
+            Notification::send(
+                $this->model->assigned_to,
+                new TaskStateChangeNotification(
+                    task: $this->model,
+                    from: $this->from,
+                    to: $this->to,
+                    type: $this->parameters['type']
+                )
+            );
+        }
+
+        // Update task metadata
+        $this->model->state_metadata = array_merge(
+            $this->model->state_metadata ?? [],
+            [
+                'last_transition' => [
+                    'from' => $this->from,
+                    'to' => $this->to,
+                    'at' => now()->toIso8601String(),
+                    'by' => auth()->id()
+                ]
+            ]
+        );
+        $this->model->save();
+    }
+
+    public function failed(): void
+    {
+        Log::error('Failed to send task notification', [
+            'task' => $this->model->id,
+            'from' => $this->from,
+            'to' => $this->to
+        ]);
+    }
+}
+```
+
+### 4. Success Jobs
+Success jobs run after successful transitions. They extend `AbstractTransitionSuccessJob` and:
+- Log state changes
+- Update statistics
+- Send webhooks
+
+```php
+class TaskAuditLogJob extends AbstractTransitionSuccessJob
+{
+    public function handle(): void
+    {
+        // Create audit log entry
+        TaskAuditLog::create([
+            'task_id' => $this->model->id,
+            'from_state' => $this->from,
+            'to_state' => $this->to,
+            'action' => $this->parameters['action'],
+            'user_id' => auth()->id(),
+            'metadata' => $this->model->state_metadata,
+            'created_at' => now()
+        ]);
+
+        // Update task statistics
+        if ($this->to === 'in_progress') {
+            $this->model->update([
+                'started_at' => now(),
+                'assigned_by' => auth()->id()
+            ]);
+        }
+
+        // Send webhook if configured
+        if ($webhookUrl = config('arflow.webhook_url')) {
+            Http::post($webhookUrl, [
+                'event' => 'task_state_change',
+                'task' => [
+                    'id' => $this->model->id,
+                    'from' => $this->from,
+                    'to' => $this->to
+                ],
+                'user' => auth()->id(),
+                'timestamp' => now()->toIso8601String()
+            ]);
+        }
+    }
+}
+```
+
+## Implementation
+
+### 1. Model Setup
+```php
+class Task extends Model implements StateableModelContract
+{
+    use HasState;
+
+    protected $fillable = [
+        'name',
+        'description',
+        'assigned_to',
+        'assigned_by',
+        'started_at',
+        'workflow',
+        'state',
+        'state_metadata'
+    ];
+
+    protected $casts = [
+        'started_at' => 'datetime',
+        'state_metadata' => 'array'
+    ];
+
+    public static function supportedWorkflows(): array
+    {
+        return ['task_workflow'];
+    }
+
+    public function assignedTo()
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
+    }
+}
+```
+
+### 2. Migration
+> **Important**: You must use the `arflow()` macro in your migration to add the required state management columns.
+
+```php
+Schema::create('tasks', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->text('description')->nullable();
+    $table->foreignId('assigned_to')->nullable()->constrained('users');
+    $table->foreignId('assigned_by')->nullable()->constrained('users');
+    $table->timestamp('started_at')->nullable();
+    
+    // This macro adds three required columns:
+    // - workflow: string - Stores the current workflow name
+    // - state: string - Stores the current state
+    // - state_metadata: json - Stores state-related metadata
+    $table->arflow();
+    
+    $table->timestamps();
+});
+```
+
+The `arflow()` macro automatically adds these columns:
+- `workflow`: Stores the name of the current workflow
+- `state`: Stores the current state of the model
+- `state_metadata`: Stores additional state-related data as JSON
+
+Without these columns, the state management functionality will not work. Make sure to include the `arflow()` macro in your migration.
+
+## Usage
+
+### 1. Basic Usage
+```php
+// Create and apply workflow
+$task = Task::create([
+    'name' => 'New Task',
+    'description' => 'Task description',
+    'assigned_to' => $user->id
+]);
+$task->applyWorkflow('task_workflow');
+
+// Check and perform transition
+if ($task->canTransitionTo('in_progress')) {
+    $task->transitionTo('in_progress');
+}
+```
+
+### 2. Error Handling
+```php
+try {
+    $task->transitionTo('done');
+} catch (TransitionNotAllowedException $e) {
+    // Handle transition failure
+    Log::error('Transition failed', [
+        'task' => $task->id,
+        'error' => $e->getMessage()
+    ]);
+}
+```
+
+
+## Common Use Cases
+
+1. **Task Management**
+   - Todo → In Progress → Done
+   - Review workflows
+   - Assignment tracking
+   - Priority management
+   - Deadline monitoring
+
+2. **Document Workflow**
+   - Draft → Review → Approved
+   - Version control
+   - Approval tracking
+   - Comment management
+   - Document signing
+
+3. **Order Processing**
+   - Pending → Processing → Shipped → Delivered
+   - Payment verification
+   - Inventory updates
+   - Shipping status tracking
+   - Return handling
+
+4. **User Onboarding**
+   - Registration → Verification → Active
+   - Email verification
+   - Profile completion
+   - Role assignment
+   - Access control
+
+5. **Project Management**
+   - Planning → In Progress → Review → Completed
+   - Milestone tracking
+   - Resource allocation
+   - Budget monitoring
+   - Status reporting
+
+6. **Support Ticket System**
+   - New → Assigned → In Progress → Resolved
+   - Priority management
+   - SLA tracking
+   - Escalation handling
+   - Resolution verification
+
+7. **Content Publishing**
+   - Draft → Review → Scheduled → Published
+   - SEO optimization
+   - Media management
+   - Publishing schedule
+   - Archive management
+
+8. **Leave Request**
+   - Submitted → Manager Review → HR Review → Approved/Rejected
+   - Balance checking
+   - Approval chain
+   - Calendar integration
+   - Notification system
+
+9. **Purchase Request**
+   - Draft → Manager Approval → Procurement → Ordered
+   - Budget validation
+   - Vendor selection
+   - Price comparison
+   - Order tracking
+
+10. **Quality Assurance**
+    - New → Testing → Review → Passed/Failed
+    - Test case management
+    - Bug tracking
+    - Regression testing
+    - Release management
+
+Each use case can be implemented with:
+- Custom guards for business rules
+- Actions for notifications and updates
+- Success jobs for logging and reporting
+- Metadata for tracking and analytics
+
+## Exceptions
+
+ArFlow throws specific exceptions in different scenarios. Here's when each exception is thrown:
+
+### 1. Workflow Related Exceptions
+
+- `WorkflowNotFoundException`: When trying to use a workflow that doesn't exist in the configuration
+  ```php
+  // Thrown when workflow 'non_existent' is not found in config
+  $model->applyWorkflow('non_existent');
+  ```
+
+- `WorkflowNotSupportedException`: When trying to use a workflow that the model doesn't support
+  ```php
+  // Thrown when model doesn't support the workflow in supportedWorkflows()
+  $model->applyWorkflow('unsupported_workflow');
+  ```
+
+- `WorkflowNotAppliedException`: When trying to perform operations without applying a workflow first
+  ```php
+  // Thrown when trying to transition without applying workflow
+  $model->transitionTo('new_state');
+  ```
+
+### 2. State Related Exceptions
+
+- `StateNotFoundException`: When trying to access a state that doesn't exist in the workflow
+  ```php
+  // Thrown when state doesn't exist in workflow definition
+  $model->transitionTo('non_existent_state');
+  ```
+
+- `InitialStateNotFoundException`: When workflow configuration doesn't specify an initial state
+  ```php
+  // Thrown when initial_state is missing in workflow config
+  $model->applyWorkflow('workflow_without_initial_state');
+  ```
+
+### 3. Transition Related Exceptions
+
+- `TransitionNotFoundException`: When trying to perform a transition that doesn't exist
+  ```php
+  // Thrown when no transition exists from current state to target state
+  $model->transitionTo('invalid_target_state');
+  ```
+
+- `TransitionActionException`: When an action fails during transition
+  ```php
+  // Thrown when action's handle() method fails
+  $model->transitionTo('state_with_failing_action');
+  ```
+
+### 4. Other Exceptions
+
+- `StateMetadataNotFoundException`: When trying to access metadata that doesn't exist
+  ```php
+  // Thrown when trying to access non-existent metadata
+  $model->getStateMetadata('non_existent_key');
+  ```
+
+- `NotImplementedException`: When required methods are not implemented
+  ```php
+  // Thrown when required interface methods are not implemented
+  class IncompleteGuard implements TransitionGuardContract {
+      // Missing required methods
+  }
+  ```
+
+### Error Handling Example
+
+```php
+try {
+    $model->applyWorkflow('task_workflow');
+    $model->transitionTo('in_progress');
+} catch (WorkflowNotFoundException $e) {
+    // Handle missing workflow
+    Log::error('Workflow not found', ['workflow' => 'task_workflow']);
+} catch (WorkflowNotSupportedException $e) {
+    // Handle unsupported workflow
+    Log::error('Workflow not supported', ['workflow' => 'task_workflow']);
+} catch (TransitionNotFoundException $e) {
+    // Handle invalid transition
+    Log::error('Transition not found', ['to' => 'in_progress']);
+} catch (TransitionActionException $e) {
+    // Handle action failure
+    Log::error('Action failed', ['error' => $e->getMessage()]);
+} catch (Exception $e) {
+    // Handle other exceptions
+    Log::error('Unexpected error', ['error' => $e->getMessage()]);
+}
+```
+
