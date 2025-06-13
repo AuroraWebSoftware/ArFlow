@@ -341,6 +341,7 @@ trait HasState
     /**
      * @param  class-string|null  $actorModelType
      * @param  array<class-string>|null  $withoutGuards
+     * @param  array<string, mixed>|null  $metadata
      *
      * @throws StateNotFoundException
      * @throws TransitionActionException

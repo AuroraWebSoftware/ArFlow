@@ -57,7 +57,7 @@
             "@composer run build",
             "@php vendor/bin/testbench serve"
         ],
-        "analyse": "php -d memory_limit=2G vendor/bin/phpstan analyse --memory-limit=2G",
+        "analyse": "php -d memory_limit=20G vendor/bin/phpstan analyse",
         "test": "vendor/bin/pest",
         "test-coverage": "vendor/bin/pest --coverage",
         "format": "vendor/bin/pint"

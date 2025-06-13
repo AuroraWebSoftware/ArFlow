@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Config;
 
 class ArFlowService
 {
-    /** @var array<string, array{states: array<string>, initial_state: string, transitions?: array<string, array{from: string|array<string>, to: string|array<string>, guards?: array<array{0: class-string, 1?: array<string, mixed>}>, actions?: array<array{0: class-string, 1?: array<string, mixed>}>, success_metadata?: array<string, mixed>, success_jobs?: array<array{0: class-string, 1?: array<string, mixed>}>}>}> */
+    /** @var array<string, array{states?: array<string>, initial_state: string, transitions?: array<string, array{from: string|array<string>, to: string|array<string>, guards?: array<array{0: class-string, 1?: array<string, mixed>}>, actions?: array<array{0: class-string, 1?: array<string, mixed>}>, success_metadata?: array<string, mixed>, success_jobs?: array<array{0: class-string, 1?: array<string, mixed>}>}>}> */
     private array $workflows;
 
     public function __construct()
@@ -22,12 +22,13 @@ class ArFlowService
      * @return array<string>
      *
      * @throws WorkflowNotFoundException
+     * @throws StateNotFoundException
      */
     public function getStates(string $workflow): array
     {
         foreach ($this->workflows as $workflowKey => $workflowValues) {
             if ($workflowKey == $workflow) {
-                return $workflowValues['states'];
+                return $workflowValues['states'] ?? throw new StateNotFoundException;
             }
         }
         throw new WorkflowNotFoundException;
