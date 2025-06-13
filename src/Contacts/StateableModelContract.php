@@ -69,7 +69,7 @@ interface StateableModelContract
     public function currentStateMetadata(): array;
 
     /**
-     * @param array<class-string>|null $withoutGuards
+     * @param  array<class-string>|null  $withoutGuards
      * @return TransitionGuardResultCollection<string, Collection<int, TransitionGuardResultDTO>>
      *
      * @throws WorkflowNotFoundException
@@ -77,37 +77,37 @@ interface StateableModelContract
     public function transitionGuardResults(string $toState, ?array $withoutGuards = null): TransitionGuardResultCollection;
 
     /**
-     * @param array<class-string>|null $withoutGuards
+     * @param  array<class-string>|null  $withoutGuards
      */
     public function canTransitionTo(string $toState, ?array $withoutGuards = null): bool;
 
     /**
-     * @param array<class-string>|null $withoutGuards
+     * @param  array<class-string>|null  $withoutGuards
      * @return array<string>|null
      */
     public function definedTransitionKeys(?array $withoutGuards = null): ?array;
 
     /**
      * @param  array<class-string>|null  $withoutGuards
+     * @return array<string>|null
      *
      * @throws WorkflowNotFoundException
      * @throws Throwable
-     * @return array<string>|null
      */
     public function allowedTransitionKeys(?array $withoutGuards = null): ?array;
 
     /**
-     * @param array<class-string>|null $withoutGuards
+     * @param  array<class-string>|null  $withoutGuards
      * @return array<string>|null
      */
     public function definedTransitionStates(?array $withoutGuards = null): ?array;
 
     /**
      * @param  array<class-string>|null  $withoutGuards
+     * @return array<string>|null
      *
      * @throws WorkflowNotFoundException
      * @throws Throwable
-     * @return array<string>|null
      */
     public function allowedTransitionStates(?array $withoutGuards = null): ?array;
 

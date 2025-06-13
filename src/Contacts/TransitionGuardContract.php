@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 interface TransitionGuardContract
 {
     /**
-     * @param array<string, mixed> $parameters
+     * @param  array<string, mixed>  $parameters
      */
     public function boot(StateableModelContract&Model $model, string $from, string $to, array $parameters): void;
 
