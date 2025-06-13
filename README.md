@@ -2,7 +2,7 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/aurorawebsoftware/arflow.svg?style=flat-square)](https://packagist.org/packages/aurorawebsoftware/arflow)
 [![Tests](https://github.com/aurorawebsoftware/arflow/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/aurorawebsoftware/arflow/actions/workflows/run-tests.yml)
-[![Code Style](https://github.com/aurorawebsoftware/arflow/actions/workflows/php-cs-fixer.yml/badge.svg?branch=main)](https://github.com/aurorawebsoftware/arflow/actions/workflows/php-cs-fixer.yml)
+[![Code Style](https://github.com/aurorawebsoftware/arflow/actions/workflows/fix-php-code-style-issues.yml/badge.svg?branch=main)](https://github.com/aurorawebsoftware/arflow/actions/workflows/fix-php-code-style-issues.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/aurorawebsoftware/arflow.svg?style=flat-square)](https://packagist.org/packages/aurorawebsoftware/arflow)
 
 ![img.png](assests%2Fimg.png)
