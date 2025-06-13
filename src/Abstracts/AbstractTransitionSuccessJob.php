@@ -19,6 +19,7 @@ abstract class AbstractTransitionSuccessJob implements ShouldQueue
         public StateableModelContract&Model $model,
         public string $from,
         public string $to,
+        /** @var array<string, mixed> */
         public array $parameters = []) {}
 
     /**

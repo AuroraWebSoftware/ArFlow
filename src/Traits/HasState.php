@@ -24,6 +24,9 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 
+/**
+ * @phpstan-ignore-next-line
+ */
 trait HasState
 {
     public function getId(): int|string
@@ -338,6 +341,7 @@ trait HasState
     /**
      * @param  class-string|null  $actorModelType
      * @param  array<class-string>|null  $withoutGuards
+     * @param  array<string, mixed>|null  $metadata
      *
      * @throws StateNotFoundException
      * @throws TransitionActionException
