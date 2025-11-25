@@ -20,7 +20,6 @@ ArFlow provides state machine and workflow management for Eloquent models with g
 Every model using ArFlow must:
 
 1. Use the `HasState` trait
-2. Implement the `StateableModelContract` interface
 3. Define `supportedWorkflows()` method
 
 @verbatim
