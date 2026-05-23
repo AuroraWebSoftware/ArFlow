@@ -1,5 +1,8 @@
 <?php
 
+use AuroraWebSoftware\ArFlow\Tests\Guards\TestAllowedTransitionGuard;
+use AuroraWebSoftware\ArFlow\Tests\TransitionActions\TestSuccessTransitionAction;
+
 return [
     'workflows' => [
         'workflow1' => [
@@ -10,10 +13,10 @@ return [
                     'from' => ['a'],
                     'to' => 'b',
                     'guard' => [
-                        [\AuroraWebSoftware\ArFlow\Tests\Guards\TestAllowedTransitionGuard::class, ['permission' => 'represtative_approval']],
+                        [TestAllowedTransitionGuard::class, ['permission' => 'represtative_approval']],
                     ],
                     'action' => [
-                        [\AuroraWebSoftware\ArFlow\Tests\TransitionActions\TestSuccessTransitionAction::class, ['a' => 'b']],
+                        [TestSuccessTransitionAction::class, ['a' => 'b']],
                     ],
                     'successMetadata' => ['asd' => 'asd'],
                     'successJob' => [],
